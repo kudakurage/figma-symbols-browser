@@ -1,0 +1,7 @@
+{
+  "name": "Symbols Browser",
+  "id": "770570903162993974",
+  "api": "1.0.0",
+  "main": "code.js",
+  "ui": "ui.html"
+}
