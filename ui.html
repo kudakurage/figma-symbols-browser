@@ -1,64 +1,347 @@
 <style>
   body {
+    font-family: 'SF Pro Display', 'SF Compact Display', sans-serif;
     background: #222;
     margin: 0;
-    padding: 20px;
-    font-family: serif;
-    font-size: 14px;
+    padding: 20px 5px;
+    font-size: 16px;
     color: #fff;
   }
-  .sf {
-    font-family: 'SF Pro Display', 'SF Compact Display';
-    font-size: 48px;
+  .clearfix::after {
+    content: "";
+    display: block;
+    clear: both;
+  }
+  textarea {
+      height:1px;
+      border:0;
+      margin:0;
+      padding:0;
+      opacity:0;
+  }
+  #navbar {
+    position: fixed;
+    background: #333;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 50px;
+    padding: 10px;
+    box-sizing: border-box;
+    z-index: 10;
+  }
+  #font-tab {
+    float: left;
+    font-size: 12px;
+    font-weight: bold;
+  }
+  #font-tab div {
+    float: left;
+    margin-right: 5px;
+    height: 30px;
+    line-height: 30px;
+    padding: 0 10px;
+    border-radius: 20px;
+    background: #555;
+    cursor: pointer;
+  }
+  #font-tab .active {
+    background: #aaa;
+    color: #222;
+  }
+  #search {
+    float: right;
+    font-size: 15px;
+    width: 160px;
+    height: 30px;
+    line-height: 30px;
+    padding: 0 5px;
+    border: 0;
+    border-radius: 4px;
+    background: #555;
+    color: #fff;
+    margin-left: 10px;
+  }
+  #display-type {
+    float: right;
+  }
+  #display-type div {
+    float: left;
+    height: 30px;
+    line-height: 30px;
+    padding: 0 5px;
+    background: #555;
+    text-align: center;
+    cursor: pointer;
+  }
+  #display-type-symbols {
+    border-radius: 4px 0 0 4px;
+  }
+  #display-type-list {
+    border-radius: 0 4px 4px 0;
+  }
+  #display-type .active {
+    background: #aaa;
+    color: #222;
+  }
+  #sfs {
+    padding: 20px 0;
+  }
+  .sfs-item {
+    height: 90px;
+    width: 90px;
+    margin-bottom: 10px;
+    padding-bottom: 5px;
+    text-align: center;
+    float: left;
+    border-radius: 5px;
+    cursor: pointer;
+  }
+  .sfs-item:hover {
+    background: #444;
+  }
+  .sfs-item:active {
+    background: #007AFF;
+    border-color: #007AFF;
+  }
+  .sfs-item-glyph {
+    height: 60px;
+    width: 90px;
+    font-size: 32px;
+    line-height: 60px;
+    pointer-events: none;
+    vertical-align: middle;
+  }
+  .sfs-item-name {
+    height: 30px;
+    width: 80px;
+    padding: 0 5px;
+    font-size: 13px;
+    overflow: hidden;
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 2;
+    word-wrap: break-word;
+    overflow-wrap : break-word;
+    pointer-events: none;
+  }
+  .display-type-symbols .sfs-item {
+    height: 50px;
+    width: 60px;
+    margin-bottom: 0;
+    padding-bottom: 0;
+  }
+  .display-type-symbols .sfs-item-glyph {
+    height: 50px;
+    width: 60px;
+    font-size: 24px;
+    line-height: 50px;
+  }
+  .display-type-symbols .sfs-item-name {
+    display: none;
+  }
+  .display-type-list .sfs-item {
+    height: 30px;
+    line-height: 30px;
+    width: 100%;
+    margin: 0 -5px;
+    padding: 0 5px;
+    border-radius: 0;
+    text-align: left;
+    float: none;
+    cursor: pointer;
+  }
+  .display-type-list .sfs-item:nth-child(2n-1) {
+    background: #333;
+  }
+  .display-type-list .sfs-item:hover {
+    background: #444;
+  }
+  .display-type-list .sfs-item:active {
+    background: #007AFF;
+  }
+  .display-type-list .sfs-item-glyph {
+    float: left;
+    height: 30px;
+    width: 40px;
+    margin: 0;
+    text-align: center;
+    font-size: 18px;
+    line-height: 30px;
+    border: 0;
+  }
+  .display-type-list .sfs-item-name {
+    height: 30px;
+    width: auto;
+    padding: 0 10px;
+    font-size: 15px;
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+  }
+  #toast-message {
+    background: rgba(0,122,255,0.85);
+    position: fixed;
+    top: 20px;
+    left: 0;
+    width: 100%;
+    height: 24px;
+    line-height: 24px;
+    box-sizing: border-box;
+    margin-top: 0;
+    text-align: center;
+    font-size: 14px;
+    font-weight: bold;
+    z-index: 0;
+    transition: 0.3s;
+  }
+  #toast-message.show {
+    margin-top: 30px;
   }
 </style>
-<h2>Rectangle Creator</h2>
-<p>Count: <input id="count" value="5"></p>
-<button id="create">Create</button>
-<button id="cancel">Cancel</button>
-
-<div class="sf">SanFrancisco Font 􀆶</div>
+<div id="navbar">
+  <!-- <div id="font-tab" class="clearfix">
+    <div id="font-tab-sfsymbols" class="active">SF Symbols</div>
+    <div id="font-tab-material">Material Icons</div>
+  </div> -->
+  <input type="text" id="search" placeholder="􀊫 search" />
+  <div id="display-type" class="clearfix">
+    <div id="display-type-symbols" class="display-type-item">􀇹</div>
+    <div id="display-type-tile" class="display-type-item active">􀛧</div>
+    <div id="display-type-list" class="display-type-item">􀋱</div>
+  </div>
+</div>>
+<div id="toast-message">Toast Message</div>>
+<div id="sfs" class="clearfix"></div>
+<textarea></textarea>
 <script>
-var csvFileName = 'SFSymbols_20191028.csv'
+const csvFileName = 'https://raw.githubusercontent.com/kudakurage/figma-symbols-browser/master/SFSymbols.csv'
+const symbolsTable = document.getElementById('sfs')
+const searchField = document.getElementById('search')
+const toastMessage = document.getElementById('toast-message')
+const displayTypeItem = document.getElementsByClassName('display-type-item')
+const displayTypeClassList = getDisplayTypeClassList()
+var toastID = ''
+var searchKeyword = ''
+var masterData = []
 
-document.getElementById('create').onclick = () => {
-  const textbox = document.getElementById('count');
-  const count = parseInt(textbox.value, 10);
-  parent.postMessage({ pluginMessage: { type: 'create-rectangles', count } }, '*')
-}
-
-document.getElementById('cancel').onclick = () => {
-  parent.postMessage({ pluginMessage: { type: 'cancel' } }, '*')
+for(let i = 0; i < displayTypeItem.length; i++) {
+  displayTypeItem[i].addEventListener('click', function(e){
+    for(let j = 0; j < displayTypeItem.length; j++) {
+      displayTypeItem[j].classList.remove('active')
+    }
+    for(let i = 0; i < displayTypeItem.length; i++) {
+      symbolsTable.classList.remove(displayTypeItem[i].getAttribute('id'))
+    }
+    e.target.classList.add('active')
+    symbolsTable.classList.add(e.target.getAttribute('id'))
+  }, false)
 }
 
 getCSV(csvFileName)
 
+function getDisplayTypeClassList(){
+  let classList = ''
+  for(let i = 0; i < displayTypeItem.length; i++) {
+    classList += displayTypeItem[i].getAttribute('id')+','
+  }
+  return classList
+}
+
 function getCSV(file){
   var req = new XMLHttpRequest()
-  console.log(file)
   req.open("get", file, true)
   req.send(null)
 
   req.onload = function(){
-    return csv2json(req.responseText)
+    masterData = csv2json(req.responseText)
+    // console.log(data)
+    createGlyphList(masterData)
+    setupSearch()
   }
 }
 
+function setupSearch(){
+  searchField.addEventListener('keyup', function(){
+    if(searchKeyword == searchField.value){
+      return false
+    }else{
+      searchKeyword = searchField.value
+    }
+    let wordArray = searchKeyword.split(/\s/)
+    let filteredList = masterData
+    for(let i = 0; i < wordArray.length; i++){
+      filteredList = filteringList(filteredList, wordArray[i])
+    }
+    createGlyphList(filteredList)
+  })
+}
+
+function filteringList(list, filterWord){
+  let regex = new RegExp(filterWord)
+  let filteredList = list.filter(function(value){
+    return regex.test(value.search_keyword);
+  })
+  return filteredList
+}
+
+function copyGlyph(event){
+  let glyph = event.target.getAttribute('data-glyph')
+  let textarea = document.getElementsByTagName("textarea")[0]
+  textarea.value = glyph
+  textarea.select()
+  document.execCommand("copy")
+  window.clearTimeout(toastID)
+  toastMessage.textContent = "Copied symbol: "+glyph
+  toastMessage.classList.add('show')
+  toastID = window.setTimeout(function(){toastMessage.classList.remove('show')}, 2000)
+}
+
+function createGlyphList(data){
+  symbolsTable.innerHTML = ''
+  data.forEach(val => {
+    // console.log(val)
+    if(val.ready_for_api == "FALSE"){
+      return
+    }
+    if(val.blacklist_apple_only == "TRUE"){
+      return
+    }
+    let glyph = val.character_auto ? val.character_auto : val.character
+    let divWrapper = document.createElement('div')
+    let divGlyph = document.createElement('div')
+    let divName = document.createElement('div')
+    divWrapper.classList.add('sfs-item')
+    divGlyph.classList.add('sfs-item-glyph')
+    divName.classList.add('sfs-item-Name')
+    divGlyph.textContent = glyph
+    divName.textContent = val.short_name
+    divWrapper.appendChild(divGlyph)
+    divWrapper.appendChild(divName)
+    divWrapper.setAttribute('data-glyph', glyph)
+    divWrapper.setAttribute('data-keyword', val.search_keyword)
+    divWrapper.addEventListener('click', function(e){copyGlyph(e)}, false)
+    symbolsTable.appendChild(divWrapper)
+  })
+}
+
 function csv2json(csv){
+  // console.log(csv)
   var jsonArray = []
   var csvArray = csv.split('\n')     
   var items = csvArray[0].split(',')
  
   for (var i = 1; i < csvArray.length - 1; i++) {
-    var a_line = new Object();
-    var csvArrayD = csvArray[i].split(',');
+    var a_line = new Object()
+    var csvArrayD = csvArray[i].split(/\,(?=(?:[^"]*"[^"]*")*[^"]*$)/)
     for (var j = 0; j < items.length; j++) {
-      a_line[items[j]] = csvArrayD[j];
+      a_line[items[j]] = csvArrayD[j]
     }
-    jsonArray.push(a_line);
+    a_line.search_keyword = a_line.short_name+';'+a_line.apple_action+';'+a_line.apple_entity+';'+a_line.semantic_name_1+';'+a_line.semantic_name_2+';'+a_line.semantic_name_3;
+    jsonArray.push(a_line)
   }
-  console.debug(jsonArray);
-  return jsonArray;
+  // console.log(jsonArray)
+  return jsonArray
 }
 
 </script>
