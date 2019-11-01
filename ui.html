@@ -16,8 +16,10 @@
     display: none;
   }
   .loading {
-    background-image: url('loading.gif');
+    background-image: url('https://raw.githubusercontent.com/kudakurage/figma-symbols-browser/master/assets/loading.gif');
     background-position: center center;
+    background-repeat: no-repeat;
+    min-height: 300px;
   }
   textarea {
       height:1px;
@@ -35,6 +37,7 @@
     height: 50px;
     padding: 10px;
     box-sizing: border-box;
+    border-bottom: 1px solid #555;
     z-index: 10;
   }
   #font-tab {
@@ -92,7 +95,7 @@
     color: #222;
   }
   #sfs {
-    padding: 20px 0;
+    padding: 40px 0;
   }
   .sfs-item {
     height: 90px;
@@ -187,7 +190,7 @@
     text-overflow: ellipsis;
   }
   #toast-message {
-    background: rgba(0,122,255,0.85);
+    background: rgba(0,122,255,0.9);
     position: fixed;
     top: 20px;
     left: 0;
@@ -200,10 +203,39 @@
     font-size: 14px;
     font-weight: bold;
     z-index: 0;
+    opacity: 0;
     transition: 0.3s;
   }
   #toast-message.show {
     margin-top: 30px;
+    opacity: 1;
+  }
+  #install-font {
+    padding: 30px;
+  }
+  #install-font .title {
+    font-size: 18px;
+    font-weight: bold;
+    margin-bottom: 0;
+  }
+  #install-font .subtle {
+    font-size: 13px;
+    color: #666;
+    margin-bottom: 30px;
+  }
+  #install-font .button {
+    display: block;
+    text-align: center;
+    font-size: 18px;
+    font-weight: bold;
+    color: #fff;
+    background: #007AFF;
+    border-radius: 5px;
+    line-height: 50px;
+    text-decoration: none;
+  }
+  #install-font .button:hover {
+    opacity: 0.8;
   }
 </style>
 <div id="navbar">
@@ -217,17 +249,17 @@
     <div id="display-type-tile" class="display-type-item active">􀛧</div>
     <div id="display-type-list" class="display-type-item">􀋱</div>
   </div>
-</div>>
-<div id="toast-message">Toast Message</div>>
+</div>
+<div id="toast-message">Toast Message</div>
 <div id="sfs" class="clearfix loading"></div>
 <div id="install-font" class="hidden">
-  <p>Please install San Francisco fonts to use this plugin.</p>
+  <p class="title">Please install San Francisco fonts to use this plugin.</p>
   <p class="subtle">(Run this plugin again after installing the fonts.)</p>
-  <a href="https://developer.apple.com/fonts/">Download Page</a>
+  <a href="https://developer.apple.com/fonts/" target="_blank" class="button">Download Page</a>
 </div>
 <textarea></textarea>
 <script>
-const csvFileName = 'https://raw.githubusercontent.com/kudakurage/figma-symbols-browser/master/SFSymbols.csv'
+const csvFileName = 'https://raw.githubusercontent.com/kudakurage/figma-symbols-browser/master/assets/SFSymbols.csv'
 const symbolsTable = document.getElementById('sfs')
 const navbar = document.getElementById('navbar')
 const installFont = document.getElementById('install-font')
@@ -245,12 +277,12 @@ navbar.classList.add('hidden')
 
 window.onload = function () {
   var detective = new Detector();
-  //'SF Pro Display', 'SF Compact Display'
+  // check installing fonts: 'SF Pro Display', 'SF Compact Display'
   if (detective.detect('SF Pro Display') == true || detective.detect('SF Compact Display') == true) {
-    console.log('installed!')
+    // console.log('installed!')
     init()
   } else {
-    console.log('not install!')
+    // console.log('not install!')
     installFont.classList.remove('hidden')
   }
 };
@@ -469,5 +501,4 @@ function csv2json(csv){
 
     this.detect = detect;
 };
-
 </script>
