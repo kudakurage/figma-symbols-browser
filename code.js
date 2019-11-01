@@ -20,7 +20,7 @@ figma.ui.resize(370, 600);
 const storageKey = 'settingsData';
 const defaultDisplayType = 'display-type-tile';
 const defaultSymbolType = 'symbol-type-sfsymbols';
-const defaultSettingsData = { autoPaste: false, displayType: defaultDisplayType, symbolType: defaultSymbolType };
+const defaultSettingsData = { clickAction: 'copy', displayType: defaultDisplayType, symbolType: defaultSymbolType };
 var settingsData = JSON.parse(JSON.stringify(defaultSettingsData));
 var textObjectLength = 0;
 init();
@@ -43,15 +43,15 @@ function init() {
         figma.ui.postMessage({ settings: true, data: settingsData });
     });
 }
-function pasteFunction(nodeObjectsArray, copiedText) {
+function pasteFunction(nodeObjectsArray, copiedText, symbolType) {
     if (nodeObjectsArray.length) {
         for (let i = 0; i < nodeObjectsArray.length; i++) {
             if (nodeObjectsArray[i].type == 'TEXT') {
-                updateText(nodeObjectsArray[i], copiedText);
+                updateText(nodeObjectsArray[i], copiedText, symbolType);
                 textObjectLength++;
             }
             else if (nodeObjectsArray[i].type == 'GROUP' || nodeObjectsArray[i].type == 'FRAME' || nodeObjectsArray[i].type == 'COMPONENT' || nodeObjectsArray[i].type == 'INSTANCE') {
-                pasteFunction(nodeObjectsArray[i].children, copiedText);
+                pasteFunction(nodeObjectsArray[i].children, copiedText, symbolType);
             }
         }
         if (textObjectLength == 0) {
@@ -60,13 +60,49 @@ function pasteFunction(nodeObjectsArray, copiedText) {
     }
     return textObjectLength;
 }
-function updateText(selectedItem, pasteValue) {
+function updateText(selectedItem, pasteValue, symbolType) {
     return __awaiter(this, void 0, void 0, function* () {
         let selectedItemFontName = selectedItem.getRangeFontName(0, 1);
         let textStyleId = selectedItem.getRangeTextStyleId(0, 1);
-        yield figma.loadFontAsync({ family: selectedItemFontName.family, style: selectedItemFontName.style });
-        if (selectedItem.fontName == figma.mixed) {
-            selectedItem.setRangeFontName(0, selectedItem.characters.length, selectedItemFontName);
+        if (selectedItemFontName.family == 'SF Pro Display' || selectedItemFontName.family == 'SF Compact Display') {
+            if (symbolType == "material-icons") {
+                let tempFontName = { family: '', style: '' };
+                tempFontName.family = 'Material Icons';
+                tempFontName.style = "Regular";
+                yield figma.loadFontAsync({ family: tempFontName.family, style: tempFontName.style });
+                selectedItem.setRangeFontName(0, selectedItem.characters.length, tempFontName);
+            }
+            else {
+                yield figma.loadFontAsync({ family: selectedItemFontName.family, style: selectedItemFontName.style });
+            }
+        }
+        else if (selectedItemFontName.family == 'Material Icons') {
+            if (symbolType == "sf-symbols") {
+                let tempFontName = { family: '', style: '' };
+                tempFontName.family = 'SF Pro Display';
+                tempFontName.style = "Regular";
+                yield figma.loadFontAsync({ family: tempFontName.family, style: tempFontName.style });
+                selectedItem.setRangeFontName(0, selectedItem.characters.length, tempFontName);
+            }
+            else {
+                yield figma.loadFontAsync({ family: selectedItemFontName.family, style: selectedItemFontName.style });
+            }
+        }
+        else {
+            if (symbolType == "sf-symbols") {
+                let tempFontName = { family: '', style: '' };
+                tempFontName.family = 'SF Pro Display';
+                tempFontName.style = "Regular";
+                yield figma.loadFontAsync({ family: tempFontName.family, style: tempFontName.style });
+                selectedItem.setRangeFontName(0, selectedItem.characters.length, tempFontName);
+            }
+            else {
+                let tempFontName = { family: '', style: '' };
+                tempFontName.family = 'Material Icons';
+                tempFontName.style = "Regular";
+                yield figma.loadFontAsync({ family: tempFontName.family, style: tempFontName.style });
+                selectedItem.setRangeFontName(0, selectedItem.characters.length, tempFontName);
+            }
         }
         if (textStyleId) {
             selectedItem.setRangeTextStyleId(0, selectedItem.characters.length, textStyleId);
@@ -89,11 +125,12 @@ function updateText(selectedItem, pasteValue) {
 }
 figma.ui.onmessage = message => {
     if (message.copied) {
-        if (settingsData.autoPaste) {
-            let num = pasteFunction(figma.currentPage.selection, message.copiedGlyph);
+        if (settingsData.clickAction == 'paste') {
+            let num = pasteFunction(figma.currentPage.selection, message.copiedGlyph, message.symbolType);
         }
     }
     else if (message.updatedSettingsData) {
+        settingsData = message.updatedSettingsData;
         figma.clientStorage.setAsync(storageKey, JSON.stringify(message.updatedSettingsData));
     }
 };

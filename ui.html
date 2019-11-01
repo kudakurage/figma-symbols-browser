@@ -19,7 +19,7 @@
     background-image: url('https://raw.githubusercontent.com/kudakurage/figma-symbols-browser/master/assets/loading.gif');
     background-position: center center;
     background-repeat: no-repeat;
-    min-height: 300px;
+    min-height: 600px;
   }
   textarea {
       height:1px;
@@ -28,52 +28,51 @@
       padding:0;
       opacity:0;
   }
-  #navbar {
+  #navbar,
+  #settings-navbar {
     position: fixed;
     background: #333;
     top: 0;
     left: 0;
     width: 100%;
-    height: 50px;
-    padding: 10px;
+    height: 44px;
+    line-height: 30px;
+    padding: 7px 0 7px 7px;
     box-sizing: border-box;
     border-bottom: 1px solid #555;
     z-index: 10;
   }
-  #font-tab {
+  #symbol-type {
     float: left;
-    font-size: 12px;
     font-weight: bold;
+    margin-right: 7px;
   }
-  #font-tab div {
+  #symbol-type div {
     float: left;
-    margin-right: 5px;
+    min-width: 20px;
     height: 30px;
     line-height: 30px;
-    padding: 0 10px;
-    border-radius: 20px;
+    padding: 0 5px;
     background: #555;
+    text-align: center;
     cursor: pointer;
   }
-  #font-tab .active {
-    background: #aaa;
-    color: #222;
-  }
   #search {
-    float: right;
+    float: left;
     font-size: 15px;
     width: 160px;
     height: 30px;
     line-height: 30px;
+    margin-right: 4px;
     padding: 0 5px;
     border: 0;
     border-radius: 4px;
     background: #555;
     color: #fff;
-    margin-left: 10px;
   }
   #display-type {
-    float: right;
+    float: left;
+    margin-right: 7px;
   }
   #display-type div {
     float: left;
@@ -84,20 +83,23 @@
     text-align: center;
     cursor: pointer;
   }
-  #display-type-symbols {
+  #symbol-type div:first-child,
+  #display-type div:first-child {
     border-radius: 4px 0 0 4px;
   }
-  #display-type-list {
+  #symbol-type div:last-child,
+  #display-type div:last-child {
     border-radius: 0 4px 4px 0;
   }
+  #symbol-type .active,
   #display-type .active {
     background: #aaa;
     color: #222;
   }
-  #sfs {
-    padding: 40px 0;
+  #symbols-table {
+    padding: 35px 0 0;
   }
-  .sfs-item {
+  .symbol-item {
     height: 90px;
     width: 90px;
     margin-bottom: 10px;
@@ -107,14 +109,14 @@
     border-radius: 5px;
     cursor: pointer;
   }
-  .sfs-item:hover {
+  .symbol-item:hover {
     background: #444;
   }
-  .sfs-item:active {
+  .symbol-item:active {
     background: #007AFF;
     border-color: #007AFF;
   }
-  .sfs-item-glyph {
+  .symbol-item-glyph {
     height: 60px;
     width: 90px;
     font-size: 32px;
@@ -122,7 +124,7 @@
     pointer-events: none;
     vertical-align: middle;
   }
-  .sfs-item-name {
+  .symbol-item-name {
     height: 30px;
     width: 80px;
     padding: 0 5px;
@@ -135,22 +137,32 @@
     overflow-wrap : break-word;
     pointer-events: none;
   }
-  .display-type-symbols .sfs-item {
+  .material-icons .symbol-item-glyph {
+    font-family: 'Material Icons';
+  }
+  #symbols-table.symbol-type-material .sf-symbols,
+  #symbols-table.symbol-type-sfsymbols .material-icons {
+    display: none;
+  }
+  .material-icons-hidden #symbols-table .material-icons {
+    display: none;
+  }
+  .display-type-symbols .symbol-item {
     height: 50px;
     width: 60px;
     margin-bottom: 0;
     padding-bottom: 0;
   }
-  .display-type-symbols .sfs-item-glyph {
+  .display-type-symbols .symbol-item-glyph {
     height: 50px;
     width: 60px;
     font-size: 24px;
     line-height: 50px;
   }
-  .display-type-symbols .sfs-item-name {
+  .display-type-symbols .symbol-item-name {
     display: none;
   }
-  .display-type-list .sfs-item {
+  .display-type-list .symbol-item {
     height: 30px;
     line-height: 30px;
     width: 100%;
@@ -161,16 +173,16 @@
     float: none;
     cursor: pointer;
   }
-  .display-type-list .sfs-item:nth-child(2n-1) {
+  .display-type-list .symbol-item:nth-child(2n-1) {
     background: #333;
   }
-  .display-type-list .sfs-item:hover {
+  .display-type-list .symbol-item:hover {
     background: #444;
   }
-  .display-type-list .sfs-item:active {
+  .display-type-list .symbol-item:active {
     background: #007AFF;
   }
-  .display-type-list .sfs-item-glyph {
+  .display-type-list .symbol-item-glyph {
     float: left;
     height: 30px;
     width: 40px;
@@ -180,7 +192,7 @@
     line-height: 30px;
     border: 0;
   }
-  .display-type-list .sfs-item-name {
+  .display-type-list .symbol-item-name {
     height: 30px;
     width: auto;
     padding: 0 10px;
@@ -195,8 +207,8 @@
     top: 20px;
     left: 0;
     width: 100%;
-    height: 24px;
-    line-height: 24px;
+    height: 30px;
+    line-height: 30px;
     box-sizing: border-box;
     margin-top: 0;
     text-align: center;
@@ -207,23 +219,27 @@
     transition: 0.3s;
   }
   #toast-message.show {
-    margin-top: 30px;
+    margin-top: 24px;
     opacity: 1;
   }
-  #install-font {
-    padding: 30px;
+  #toast-message.symbol-type-material span {
+    font-family: 'Material Icons';
+    vertical-align: bottom;
   }
-  #install-font .title {
+  .install-font {
+    padding: 30px 10px;
+  }
+  .install-font .title {
     font-size: 18px;
     font-weight: bold;
     margin-bottom: 0;
   }
-  #install-font .subtle {
+  .install-font .subtle {
     font-size: 13px;
     color: #666;
     margin-bottom: 30px;
   }
-  #install-font .button {
+  .install-font .button {
     display: block;
     text-align: center;
     font-size: 18px;
@@ -234,53 +250,107 @@
     line-height: 50px;
     text-decoration: none;
   }
-  #install-font .button:hover {
+  .install-font .button:hover {
     opacity: 0.8;
   }
+  #settings-navbar {
+    padding-left: 15px;
+  }
+  #settings-button,
+  #settings-close {
+    float: left;
+    width: 30px;
+    height: 30px;
+    line-height: 30px;
+    text-align: center;
+    cursor: pointer;
+    border-radius: 5px;
+  }
+  #settings-button:hover,
+  #settings-close:hover {
+    background: #444;
+  }
+  #settings-close {
+    float: right;
+    margin-right: 4px;
+  }
+  #settings-body {
+    padding: 40px 15px;
+  }
 </style>
-<div id="navbar">
-  <!-- <div id="font-tab" class="clearfix">
-    <div id="font-tab-sfsymbols" class="active">SF Symbols</div>
-    <div id="font-tab-material">Material Icons</div>
-  </div> -->
-  <input type="text" id="search" placeholder="􀊫 search" />
-  <div id="display-type" class="clearfix">
-    <div id="display-type-symbols" class="display-type-item">􀇹</div>
-    <div id="display-type-tile" class="display-type-item active">􀛧</div>
-    <div id="display-type-list" class="display-type-item">􀋱</div>
+<div id="main-view">
+  <div id="navbar">
+    <div id="symbol-type" class="clearfix">
+      <div id="symbol-type-sfsymbols" class="symbol-type-item active"></div>
+      <div id="symbol-type-material" class="symbol-type-item">G</div>
+    </div>
+    <div id="display-type" class="clearfix">
+      <div id="display-type-symbols" class="display-type-item">􀇹</div>
+      <div id="display-type-tile" class="display-type-item active">􀛧</div>
+      <div id="display-type-list" class="display-type-item">􀋱</div>
+    </div>
+    <input type="text" id="search" placeholder="􀊫 search" />
+    <div id="settings-button">􀍠</div>
   </div>
-</div>
-<div id="toast-message">Toast Message</div>
-<div id="sfs" class="clearfix loading"></div>
-<div id="install-font" class="hidden">
-  <p class="title">Please install San Francisco fonts to use this plugin.</p>
-  <p class="subtle">(Run this plugin again after installing the fonts.)</p>
-  <a href="https://developer.apple.com/fonts/" target="_blank" class="button">Download Page</a>
+  <div id="toast-message">Toast Message</div>
+  <div id="symbols-table" class="clearfix loading"></div>
+  <div id="install-font" class="install-font hidden">
+    <p class="title">Please install San Francisco fonts to use this plugin.</p>
+    <p class="subtle">(Run this plugin again after installing the fonts.)</p>
+    <a href="https://developer.apple.com/fonts/" target="_blank" class="button">Download Page</a>
+  </div>
+  <div id="install-material-icons" class="install-font hidden">
+      <p class="title">Please install 'MaterialIcons-Regular.ttf' to display Material Icons.</p>
+      <p class="subtle">(Run this plugin again after installing the font.)</p>
+      <a href="https://github.com/google/material-design-icons" target="_blank" class="button">Download Page</a>
+    </div>
+  </div>
+<div id="settings-view" class="hidden">
+  <div id="settings-navbar">
+    <div id="settings-close">􀅾</div>
+    Settings
+  </div>
+  <div id="settings-body">
+    <div>
+      When click symbols:
+      <select id="settings-click-action" onchange="setClickActionSetting(this);">
+        <option value="copy">Copy to Clipboard</option>
+        <option value="paste">Copy & Paste to selected text</option>
+      </select>
+    </div>
+  </div>
 </div>
 <textarea></textarea>
 <script>
-const csvFileName = 'https://raw.githubusercontent.com/kudakurage/figma-symbols-browser/master/assets/SFSymbols.csv'
-const symbolsTable = document.getElementById('sfs')
+const sfCsvFileName = 'https://raw.githubusercontent.com/kudakurage/figma-symbols-browser/master/assets/SFSymbols.csv'
+const miCsvFileName = 'https://raw.githubusercontent.com/kudakurage/figma-symbols-browser/master/assets/Material_Icons.csv'
+const mainView = document.getElementById('main-view')
+const settingsView = document.getElementById('settings-view')
+const symbolsTable = document.getElementById('symbols-table')
 const navbar = document.getElementById('navbar')
 const installFont = document.getElementById('install-font')
 const searchField = document.getElementById('search')
 const toastMessage = document.getElementById('toast-message')
 const displayTypeItem = document.getElementsByClassName('display-type-item')
 const displayTypeClassList = getDisplayTypeClassList()
-var toastID = ''
-var searchKeyword = ''
-var masterData = []
+const symbolTypeItem = document.getElementsByClassName('symbol-type-item')
+const symbolTypeClassList = getSymbolTypeClassList()
+var canUsePlugin = false
+var toastID = searchKeyword = ''
+var masterDataSF = masterData = masterDataMI = []
 var settingsData = {}
+var installCheckMaterialFont = false
 
 symbolsTable.classList.add('hidden')
 navbar.classList.add('hidden')
 
 window.onload = function () {
-  var detective = new Detector();
+  let detective = new Detector();
   // check installing fonts: 'SF Pro Display', 'SF Compact Display'
   if (detective.detect('SF Pro Display') == true || detective.detect('SF Compact Display') == true) {
     // console.log('installed!')
     init()
+    canUsePlugin = true
   } else {
     // console.log('not install!')
     installFont.classList.remove('hidden')
@@ -294,14 +364,30 @@ function init(){
   for(let i = 0; i < displayTypeItem.length; i++) {
     displayTypeItem[i].addEventListener('click', function(e){
       chnageDisplayType(e.target.getAttribute('id'))
+      updateSettings()
     }, false)
   }
-  getCSV(csvFileName)
+  for(let i = 0; i < symbolTypeItem.length; i++) {
+    symbolTypeItem[i].addEventListener('click', function(e){
+      chnageSymbolType(e.target.getAttribute('id'))
+      updateSettings()
+    }, false)
+  }
+  document.getElementById('settings-button').addEventListener('click', function(e){
+    mainView.classList.add('hidden')
+    settingsView.classList.remove('hidden')
+  }, false)
+  document.getElementById('settings-close').addEventListener('click', function(e){
+    mainView.classList.remove('hidden')
+    settingsView.classList.add('hidden')
+  }, false)
+
+  getCSV();
 }
 
 // response to message from code.ts
 onmessage = event => {
-  if(event.data.pluginMessage.settings){
+  if(canUsePlugin && event.data.pluginMessage.settings){
     settingsData = event.data.pluginMessage.data
     settingsInit()
   }
@@ -318,6 +404,43 @@ function chnageDisplayType(targetId){
   document.getElementById(targetId).classList.add('active')
   symbolsTable.classList.add(targetId)
   settingsData.displayType = targetId
+}
+
+// change symbol type
+function chnageSymbolType(targetId){
+  toastMessage.classList.remove('show')
+  for(let j = 0; j < symbolTypeItem.length; j++) {
+    symbolTypeItem[j].classList.remove('active')
+  }
+  for(let i = 0; i < symbolTypeItem.length; i++) {
+    symbolsTable.classList.remove(symbolTypeItem[i].getAttribute('id'))
+    toastMessage.classList.remove(symbolTypeItem[i].getAttribute('id'))
+  }
+  document.getElementById(targetId).classList.add('active')
+  settingsData.symbolType = targetId
+  if(targetId == 'symbol-type-material' && installCheckMaterialFont == false){
+    mainView.classList.add('material-icons-hidden')
+    let detective = new Detector();
+    // check installing fonts: 'Material Icons'
+    if (detective.detect('Material Icons') == true) {
+      // console.log('installed!')
+      installCheckMaterialFont = true
+      mainView.classList.remove('material-icons-hidden')
+      document.getElementById('install-material-icons').classList.add('hidden')
+    } else {
+      // console.log('not install!')
+      document.getElementById('install-material-icons').classList.remove('hidden')
+    }
+  }else{
+    document.getElementById('install-material-icons').classList.add('hidden')
+  }
+  symbolsTable.classList.add(targetId)
+  toastMessage.classList.add(targetId)
+}
+
+// set symbol-click-action settings
+function setClickActionSetting(object){
+  settingsData.clickAction = object.options[object.selectedIndex].value
   updateSettings()
 }
 
@@ -329,6 +452,14 @@ function updateSettings(){
 // initialize settings
 function settingsInit(){
   chnageDisplayType(settingsData.displayType)
+  chnageSymbolType(settingsData.symbolType)
+  let settingClickAction = document.getElementById('settings-click-action')
+  for(i=0; settingClickAction.options.length > i; i++){
+    if(settingClickAction.options[i].value == settingsData.clickAction){
+      settingClickAction.options[i].selected = true;
+      break;
+    }
+  }
 }
 
 // get display type list
@@ -340,19 +471,13 @@ function getDisplayTypeClassList(){
   return classList
 }
 
-// download csv file
-function getCSV(file){
-  var req = new XMLHttpRequest()
-  req.open("get", file, true)
-  req.send(null)
-
-  req.onload = function(){
-    masterData = csv2json(req.responseText)
-    // console.log(data)
-    symbolsTable.classList.remove('loading')
-    createGlyphList(masterData)
-    setupSearch()
+// get symbol type list
+function getSymbolTypeClassList(){
+  let classList = ''
+  for(let i = 0; i < symbolTypeItem.length; i++) {
+    classList += symbolTypeItem[i].getAttribute('id')+','
   }
+  return classList
 }
 
 // set up search event
@@ -384,63 +509,108 @@ function filteringList(list, filterWord){
 // copy glyph to clipboard
 function copyGlyph(event){
   let glyph = event.target.getAttribute('data-glyph')
+  let symbolType = event.target.getAttribute('data-symbol-type')
   let textarea = document.getElementsByTagName("textarea")[0]
   textarea.value = glyph
   textarea.select()
   document.execCommand("copy")
   window.clearTimeout(toastID)
-  toastMessage.textContent = "Copied symbol: "+glyph
+  let message = settingsData.clickAction == 'copy' ? 'Copied symbols' : 'Copied & Pasted symbols'
+  toastMessage.innerHTML = message+': <span>'+glyph+'</span>'
   toastMessage.classList.add('show')
   toastID = window.setTimeout(function(){toastMessage.classList.remove('show')}, 2000)
-  parent.postMessage({ pluginMessage: { copied: true, copiedGlyph: glyph } }, '*');
+  parent.postMessage({ pluginMessage: { copied: true, copiedGlyph: glyph, symbolType: symbolType } }, '*');
 }
 
 // create dom of glyph list
 function createGlyphList(data){
   symbolsTable.innerHTML = ''
   data.forEach(val => {
-    // console.log(val)
-    if(val.ready_for_api == "FALSE"){
-      return
-    }
-    if(val.blacklist_apple_only == "TRUE"){
-      return
-    }
-    let glyph = val.character_auto ? val.character_auto : val.character
     let divWrapper = document.createElement('div')
     let divGlyph = document.createElement('div')
     let divName = document.createElement('div')
-    divWrapper.classList.add('sfs-item')
-    divGlyph.classList.add('sfs-item-glyph')
-    divName.classList.add('sfs-item-Name')
-    divGlyph.textContent = glyph
+    divWrapper.classList.add('symbol-item', val.symbol_type)
+    divGlyph.classList.add('symbol-item-glyph')
+    divName.classList.add('symbol-item-Name')
+    divGlyph.textContent = val.character
     divName.textContent = val.short_name
     divWrapper.appendChild(divGlyph)
     divWrapper.appendChild(divName)
-    divWrapper.setAttribute('data-glyph', glyph)
+    divWrapper.setAttribute('data-glyph', val.character)
+    divWrapper.setAttribute('data-symbol-type', val.symbol_type)
     divWrapper.setAttribute('data-keyword', val.search_keyword)
     divWrapper.addEventListener('click', function(e){copyGlyph(e)}, false)
     symbolsTable.appendChild(divWrapper)
   })
 }
 
+// download csv file
+function getCSV(){
+  let promise_sf = new Promise((resolve, reject) => {
+    let reqSF = new XMLHttpRequest()
+    reqSF.open("get", sfCsvFileName, true)
+    reqSF.send(null)
+
+    reqSF.onload = function(){
+      masterDataSF = csv2json(reqSF.responseText, 'SF')
+      resolve(true)
+    }
+  })
+
+  promise_sf.then((response) => {
+      let promise_mi = new Promise((resolve, reject) => {
+      let reqMI = new XMLHttpRequest()
+      reqMI.open("get", miCsvFileName, true)
+      reqMI.send(null)
+
+      reqMI.onload = function(){
+        masterDataMI = csv2json(reqMI.responseText, 'MI')
+        resolve(true)
+      }
+    }).then((response) => {
+      masterData = masterDataSF.concat(masterDataMI)
+      symbolsTable.classList.remove('loading')
+      createGlyphList(masterData)
+      setupSearch()
+    })
+  })
+}
+
 // convert csv to json
-function csv2json(csv){
-  // console.log(csv)
+function csv2json(csv, type){
   var jsonArray = []
   var csvArray = csv.split('\n')     
   var items = csvArray[0].split(',')
  
   for (var i = 1; i < csvArray.length - 1; i++) {
-    var a_line = new Object()
-    var csvArrayD = csvArray[i].split(/\,(?=(?:[^"]*"[^"]*")*[^"]*$)/)
+    let a_line = new Object()
+    let master_line = new Object()
+    let csvArrayD = csvArray[i].split(/\,(?=(?:[^"]*"[^"]*")*[^"]*$)/)
+
     for (var j = 0; j < items.length; j++) {
       a_line[items[j]] = csvArrayD[j]
     }
-    a_line.search_keyword = a_line.short_name+';'+a_line.apple_action+';'+a_line.apple_entity+';'+a_line.semantic_name_1+';'+a_line.semantic_name_2+';'+a_line.semantic_name_3;
-    jsonArray.push(a_line)
+
+    if(type == "SF" && a_line.ready_for_api == "FALSE"){
+      continue;
+    }
+    if(type == "SF" && a_line.blacklist_apple_only == "TRUE"){
+      continue;
+    }
+
+    if(type == "SF"){
+      master_line.short_name = a_line.short_name.replace(/[\.\_]/g, ' ')
+      master_line.search_keyword = a_line.short_name+';'+a_line.apple_action+';'+a_line.apple_entity+';'+a_line.semantic_name_1+';'+a_line.semantic_name_2+';'+a_line.semantic_name_3
+      master_line.symbol_type = "sf-symbols"
+      master_line.character = a_line.character_auto ? a_line.character_auto : a_line.character
+    }else{
+      master_line.short_name = a_line.short_name.replace(/[\.\_]/g, ' ')
+      master_line.search_keyword = a_line.short_name
+      master_line.symbol_type = "material-icons"
+      master_line.character = a_line.character
+    }
+    jsonArray.push(master_line)
   }
-  // console.log(jsonArray)
   return jsonArray
 }
 
