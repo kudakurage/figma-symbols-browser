@@ -11,23 +11,82 @@ figma.ui.resize(370, 600)
 // Calls to "parent.postMessage" from within the HTML page will trigger this
 // callback. The callback will be passed the "pluginMessage" property of the
 // posted message.
-figma.ui.onmessage = msg => {
-  // One way of distinguishing between different types of messages sent from
-  // your HTML page is to use an object with a "type" property like this.
-  if (msg.type === 'create-rectangles') {
-    const nodes: SceneNode[] = [];
-    for (let i = 0; i < msg.count; i++) {
-      const rect = figma.createRectangle();
-      rect.x = i * 150;
-      rect.fills = [{type: 'SOLID', color: {r: 1, g: 0.5, b: 0}}];
-      figma.currentPage.appendChild(rect);
-      nodes.push(rect);
+const storageKey = 'settingsData'
+const defaultDisplayType = 'display-type-tile'
+const defaultSymbolType = 'symbol-type-sfsymbols'
+const defaultSettingsData = { autoPaste: false, displayType: defaultDisplayType, symbolType: defaultSymbolType }
+var settingsData = JSON.parse(JSON.stringify(defaultSettingsData));
+var textObjectLength = 0
+init()
+
+function init(){
+  figma.clientStorage.getAsync(storageKey).then(result => {
+    if (result){
+      Object.keys(defaultSettingsData).forEach((key) => {
+        let data = JSON.parse(result)
+        settingsData[key] = data[key]
+        if(!settingsData[key]){
+          settingsData[key] = defaultSettingsData[key]
+        }
+      });
+      figma.clientStorage.setAsync(storageKey, JSON.stringify(settingsData))
+    } else {
+      figma.clientStorage.setAsync(storageKey, JSON.stringify(defaultSettingsData))
+      settingsData = defaultSettingsData
     }
-    figma.currentPage.selection = nodes;
-    figma.viewport.scrollAndZoomIntoView(nodes);
+    figma.ui.postMessage({ settings : true, data : settingsData })
+  })
+}
+
+function pasteFunction(nodeObjectsArray, copiedText){
+  if (nodeObjectsArray.length){
+    for (let i = 0; i < nodeObjectsArray.length; i++) {
+      if(nodeObjectsArray[i].type == 'TEXT'){
+        updateText(nodeObjectsArray[i], copiedText)
+        textObjectLength++
+      } else if (nodeObjectsArray[i].type == 'GROUP' || nodeObjectsArray[i].type == 'FRAME' || nodeObjectsArray[i].type == 'COMPONENT' || nodeObjectsArray[i].type == 'INSTANCE'){
+        pasteFunction(nodeObjectsArray[i].children, copiedText)
+      }
+    }
+    if (textObjectLength == 0){
+      // none
+    }
+  }
+  return textObjectLength
+}
+
+async function updateText(selectedItem, pasteValue) {
+  let selectedItemFontName = selectedItem.getRangeFontName(0, 1)
+  let textStyleId = selectedItem.getRangeTextStyleId(0, 1)
+  await figma.loadFontAsync({ family: selectedItemFontName.family, style: selectedItemFontName.style })
+  if(selectedItem.fontName == figma.mixed){
+    selectedItem.setRangeFontName(0, selectedItem.characters.length, selectedItemFontName)
   }
 
-  // Make sure to close the plugin when you're done. Otherwise the plugin will
-  // keep running, which shows the cancel button at the bottom of the screen.
-  figma.closePlugin();
-};
+  if(textStyleId){
+    selectedItem.setRangeTextStyleId(0, selectedItem.characters.length, textStyleId)
+  }else{
+    selectedItem.setRangeFontSize(0, selectedItem.characters.length, selectedItem.getRangeFontSize(0, 1))
+    selectedItem.setRangeTextCase(0, selectedItem.characters.length, selectedItem.getRangeTextCase(0, 1))
+    selectedItem.setRangeTextDecoration(0, selectedItem.characters.length, selectedItem.getRangeTextDecoration(0, 1))
+    selectedItem.setRangeLetterSpacing(0, selectedItem.characters.length, selectedItem.getRangeLetterSpacing(0, 1))
+    selectedItem.setRangeLineHeight(0, selectedItem.characters.length, selectedItem.getRangeLineHeight(0, 1))
+  }
+
+  if(selectedItem.getRangeFillStyleId(0, 1)){
+    selectedItem.setRangeFillStyleId(0, selectedItem.characters.length, selectedItem.getRangeFillStyleId(0, 1))
+  }else{
+    selectedItem.setRangeFills(0, selectedItem.characters.length, selectedItem.getRangeFills(0, 1))
+  }
+  selectedItem.characters = pasteValue
+}
+
+figma.ui.onmessage = message => {
+  if (message.copied) {
+    if (settingsData.autoPaste){
+      let num = pasteFunction(figma.currentPage.selection, message.copiedGlyph)
+    }
+  }else if(message.updatedSettingsData){
+    figma.clientStorage.setAsync(storageKey, JSON.stringify(message.updatedSettingsData))
+  }
+}

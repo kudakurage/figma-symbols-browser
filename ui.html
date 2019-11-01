@@ -12,6 +12,13 @@
     display: block;
     clear: both;
   }
+  .hidden {
+    display: none;
+  }
+  .loading {
+    background-image: url('loading.gif');
+    background-position: center center;
+  }
   textarea {
       height:1px;
       border:0;
@@ -212,11 +219,18 @@
   </div>
 </div>>
 <div id="toast-message">Toast Message</div>>
-<div id="sfs" class="clearfix"></div>
+<div id="sfs" class="clearfix loading"></div>
+<div id="install-font" class="hidden">
+  <p>Please install San Francisco fonts to use this plugin.</p>
+  <p class="subtle">(Run this plugin again after installing the fonts.)</p>
+  <a href="https://developer.apple.com/fonts/">Download Page</a>
+</div>
 <textarea></textarea>
 <script>
 const csvFileName = 'https://raw.githubusercontent.com/kudakurage/figma-symbols-browser/master/SFSymbols.csv'
 const symbolsTable = document.getElementById('sfs')
+const navbar = document.getElementById('navbar')
+const installFont = document.getElementById('install-font')
 const searchField = document.getElementById('search')
 const toastMessage = document.getElementById('toast-message')
 const displayTypeItem = document.getElementsByClassName('display-type-item')
@@ -224,22 +238,68 @@ const displayTypeClassList = getDisplayTypeClassList()
 var toastID = ''
 var searchKeyword = ''
 var masterData = []
+var settingsData = {}
 
-for(let i = 0; i < displayTypeItem.length; i++) {
-  displayTypeItem[i].addEventListener('click', function(e){
-    for(let j = 0; j < displayTypeItem.length; j++) {
-      displayTypeItem[j].classList.remove('active')
-    }
-    for(let i = 0; i < displayTypeItem.length; i++) {
-      symbolsTable.classList.remove(displayTypeItem[i].getAttribute('id'))
-    }
-    e.target.classList.add('active')
-    symbolsTable.classList.add(e.target.getAttribute('id'))
-  }, false)
+symbolsTable.classList.add('hidden')
+navbar.classList.add('hidden')
+
+window.onload = function () {
+  var detective = new Detector();
+  //'SF Pro Display', 'SF Compact Display'
+  if (detective.detect('SF Pro Display') == true || detective.detect('SF Compact Display') == true) {
+    console.log('installed!')
+    init()
+  } else {
+    console.log('not install!')
+    installFont.classList.remove('hidden')
+  }
+};
+
+
+function init(){
+  symbolsTable.classList.remove('hidden')
+  navbar.classList.remove('hidden')
+  for(let i = 0; i < displayTypeItem.length; i++) {
+    displayTypeItem[i].addEventListener('click', function(e){
+      chnageDisplayType(e.target.getAttribute('id'))
+    }, false)
+  }
+  getCSV(csvFileName)
 }
 
-getCSV(csvFileName)
+// response to message from code.ts
+onmessage = event => {
+  if(event.data.pluginMessage.settings){
+    settingsData = event.data.pluginMessage.data
+    settingsInit()
+  }
+}
 
+// change display type of symbols list
+function chnageDisplayType(targetId){
+  for(let j = 0; j < displayTypeItem.length; j++) {
+    displayTypeItem[j].classList.remove('active')
+  }
+  for(let i = 0; i < displayTypeItem.length; i++) {
+    symbolsTable.classList.remove(displayTypeItem[i].getAttribute('id'))
+  }
+  document.getElementById(targetId).classList.add('active')
+  symbolsTable.classList.add(targetId)
+  settingsData.displayType = targetId
+  updateSettings()
+}
+
+// send message update settings to code.ts
+function updateSettings(){
+  parent.postMessage({ pluginMessage: { updatedSettingsData: settingsData } }, '*');
+}
+
+// initialize settings
+function settingsInit(){
+  chnageDisplayType(settingsData.displayType)
+}
+
+// get display type list
 function getDisplayTypeClassList(){
   let classList = ''
   for(let i = 0; i < displayTypeItem.length; i++) {
@@ -248,6 +308,7 @@ function getDisplayTypeClassList(){
   return classList
 }
 
+// download csv file
 function getCSV(file){
   var req = new XMLHttpRequest()
   req.open("get", file, true)
@@ -256,11 +317,13 @@ function getCSV(file){
   req.onload = function(){
     masterData = csv2json(req.responseText)
     // console.log(data)
+    symbolsTable.classList.remove('loading')
     createGlyphList(masterData)
     setupSearch()
   }
 }
 
+// set up search event
 function setupSearch(){
   searchField.addEventListener('keyup', function(){
     if(searchKeyword == searchField.value){
@@ -277,6 +340,7 @@ function setupSearch(){
   })
 }
 
+// filter symbols list with search word
 function filteringList(list, filterWord){
   let regex = new RegExp(filterWord)
   let filteredList = list.filter(function(value){
@@ -285,6 +349,7 @@ function filteringList(list, filterWord){
   return filteredList
 }
 
+// copy glyph to clipboard
 function copyGlyph(event){
   let glyph = event.target.getAttribute('data-glyph')
   let textarea = document.getElementsByTagName("textarea")[0]
@@ -295,8 +360,10 @@ function copyGlyph(event){
   toastMessage.textContent = "Copied symbol: "+glyph
   toastMessage.classList.add('show')
   toastID = window.setTimeout(function(){toastMessage.classList.remove('show')}, 2000)
+  parent.postMessage({ pluginMessage: { copied: true, copiedGlyph: glyph } }, '*');
 }
 
+// create dom of glyph list
 function createGlyphList(data){
   symbolsTable.innerHTML = ''
   data.forEach(val => {
@@ -325,6 +392,7 @@ function createGlyphList(data){
   })
 }
 
+// convert csv to json
 function csv2json(csv){
   // console.log(csv)
   var jsonArray = []
@@ -343,5 +411,63 @@ function csv2json(csv){
   // console.log(jsonArray)
   return jsonArray
 }
+
+/**
+ * JavaScript code to detect available availability of a
+ * particular font in a browser using JavaScript and CSS.
+ *
+ * Author : Lalit Patel
+ * Website: http://www.lalit.org/lab/javascript-css-font-detect/
+ * License: Apache Software License 2.0
+ *          http://www.apache.org/licenses/LICENSE-2.0
+ */
+
+/**
+ * Usage: d = new Detector();
+ *        d.detect('font name');
+ */
+ var Detector = function() {
+    // a font will be compared against all the three default fonts.
+    // and if it doesn't match all 3 then that font is not available.
+    var baseFonts = ['monospace', 'sans-serif', 'serif'];
+
+    //we use m or w because these two characters take up the maximum width.
+    // And we use a LLi so that the same matching fonts can get separated
+    var testString = "mmmmmmmmmmlli";
+
+    //we test using 72px font size, we may use any size. I guess larger the better.
+    var testSize = '72px';
+
+    var h = document.getElementsByTagName("body")[0];
+
+    // create a SPAN in the document to get the width of the text we use to test
+    var s = document.createElement("span");
+    s.style.fontSize = testSize;
+    s.innerHTML = testString;
+    var defaultWidth = {};
+    var defaultHeight = {};
+    for (var index in baseFonts) {
+        //get the default width for the three base fonts
+        s.style.fontFamily = baseFonts[index];
+        h.appendChild(s);
+        defaultWidth[baseFonts[index]] = s.offsetWidth; //width for the default font
+        defaultHeight[baseFonts[index]] = s.offsetHeight; //height for the defualt font
+        h.removeChild(s);
+    }
+
+    function detect(font) {
+        var detected = false;
+        for (var index in baseFonts) {
+            s.style.fontFamily = font + ',' + baseFonts[index]; // name of the font along with the base font for fallback.
+            h.appendChild(s);
+            var matched = (s.offsetWidth != defaultWidth[baseFonts[index]] || s.offsetHeight != defaultHeight[baseFonts[index]]);
+            h.removeChild(s);
+            detected = detected || matched;
+        }
+        return detected;
+    }
+
+    this.detect = detect;
+};
 
 </script>
