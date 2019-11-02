@@ -41,6 +41,7 @@
     box-sizing: border-box;
     border-bottom: 1px solid #555;
     z-index: 10;
+    user-select: none;
   }
   #symbol-type {
     float: left;
@@ -69,6 +70,20 @@
     border: 0;
     border-radius: 4px;
     background: #555;
+    color: #fff;
+    user-select: auto;
+  }
+  #search-reset {
+    position: absolute;
+    margin-left: 300px;
+    font-size: 14px;
+    height: 30px;
+    width: 25px;
+    color: #ccc;
+    text-align: center;
+    cursor: pointer;
+  }
+  #search-reset:hover {
     color: #fff;
   }
   #display-type {
@@ -99,6 +114,7 @@
   }
   #symbols-table {
     padding: 35px 0 0;
+    user-select: none;
   }
   .symbol-item {
     height: 90px;
@@ -137,9 +153,6 @@
     word-wrap: break-word;
     overflow-wrap : break-word;
     pointer-events: none;
-  }
-  .material-icons .symbol-item-glyph {
-    font-family: 'Material Icons';
   }
   #symbols-table.symbol-type-material .sf-symbols,
   #symbols-table.symbol-type-sfsymbols .material-icons {
@@ -202,6 +215,16 @@
     white-space: nowrap;
     text-overflow: ellipsis;
   }
+  .material-icons .symbol-item-glyph {
+    font-family: 'Material Icons';
+    font-size: 36px;
+  }
+  .display-type-symbols .material-icons .symbol-item-glyph {
+    font-size: 28px;
+  }
+  .display-type-list .material-icons .symbol-item-glyph {
+    font-size: 22px;
+  }
   #toast-message {
     background: rgba(0,122,255,0.9);
     position: fixed;
@@ -218,6 +241,7 @@
     z-index: 0;
     opacity: 0;
     transition: 0.3s;
+    user-select: none;
   }
   #toast-message.show {
     margin-top: 24px;
@@ -278,6 +302,38 @@
   #settings-body {
     padding: 40px 15px;
   }
+  #settings-body .setting-item {
+    margin-bottom: 20px;
+    padding-bottom: 20px;
+    border-bottom: 1px solid #333;
+  }
+  #settings-body .setting-item span {
+    display: inline-block;
+    width: 145px;
+    user-select: none;
+  }
+  #settings-body select {
+    width: 180px;
+    height: 28px;
+  }
+  #settings-body input {
+    width: 180px;
+    padding: 5px;
+    border-radius: 5px;
+  }
+  .copyright {
+      font-size: 11px;
+      color: #666;
+      margin-top: 20px;
+      text-align: center;
+  }
+  .copyright a {
+      color: #666;
+      text-decoration: none;
+  }
+  .copyright a:hover {
+      color: #999;
+  }
 </style>
 <div id="main-view">
   <div id="navbar">
@@ -291,6 +347,7 @@
       <div id="display-type-list" class="display-type-item">􀋱</div>
     </div>
     <input type="text" id="search" placeholder="􀊫 search" />
+    <div id="search-reset" class="hidden" onclick="resetSearch()">􀁑</div>
     <div id="settings-button">􀍠</div>
   </div>
   <div id="toast-message">Toast Message</div>
@@ -312,13 +369,18 @@
     Settings
   </div>
   <div id="settings-body">
-    <div>
-      When click symbols:
-      <select id="settings-click-action" onchange="setClickActionSetting(this);">
+    <div class="setting-item">
+      <span>When click symbols:</span>
+      <select id="settings-click-action" onchange="setClickActionSetting(this)">
         <option value="copy">Copy to Clipboard</option>
         <option value="paste">Copy & Paste to selected text</option>
       </select>
     </div>
+    <div class="setting-item">
+      <span>Window height size:</span>
+      <input id="settings-window-height" onchange="setWindowHeightSetting(this)" type="number" min="200" max="1000" />
+    </div>
+    <div class="copyright"><a href="https://www.spinners.work/" target="_blank">Copyright © 2019 Spinners Inc.</a></div>
   </div>
 </div>
 <textarea></textarea>
@@ -331,6 +393,7 @@ const symbolsTable = document.getElementById('symbols-table')
 const navbar = document.getElementById('navbar')
 const installFont = document.getElementById('install-font')
 const searchField = document.getElementById('search')
+const searchReset = document.getElementById('search-reset')
 const toastMessage = document.getElementById('toast-message')
 const displayTypeItem = document.getElementsByClassName('display-type-item')
 const displayTypeClassList = getDisplayTypeClassList()
@@ -445,6 +508,17 @@ function setClickActionSetting(object){
   updateSettings()
 }
 
+function setWindowHeightSetting(object){
+  if(object.value < 200){
+    object.value = 200
+  }
+  if(object.value > 1000){
+    object.value = 1000
+  }
+  settingsData.windowHeight = object.value
+  updateSettings()
+}
+
 // send message update settings to code.ts
 function updateSettings(){
   parent.postMessage({ pluginMessage: { updatedSettingsData: settingsData } }, '*');
@@ -461,6 +535,8 @@ function settingsInit(){
       break;
     }
   }
+  let settingWindowHeight = document.getElementById('settings-window-height')
+  settingWindowHeight.value = settingsData.windowHeight
 }
 
 // get display type list
@@ -489,6 +565,11 @@ function setupSearch(){
     }else{
       searchKeyword = searchField.value
     }
+    if(searchKeyword.length > 0){
+      searchReset.classList.remove('hidden')
+    }else{
+      searchReset.classList.add('hidden')
+    }
     let wordArray = searchKeyword.split(/\s/)
     let filteredList = masterData
     for(let i = 0; i < wordArray.length; i++){
@@ -496,6 +577,13 @@ function setupSearch(){
     }
     createGlyphList(filteredList)
   })
+}
+
+// Reset search word 
+function resetSearch(){
+  searchField.value = ""
+  searchReset.classList.add('hidden')
+  createGlyphList(masterData)
 }
 
 // filter symbols list with search word

@@ -7,14 +7,13 @@
 
 // This shows the HTML page in "ui.html".
 figma.showUI(__html__)
-figma.ui.resize(370, 600)
 // Calls to "parent.postMessage" from within the HTML page will trigger this
 // callback. The callback will be passed the "pluginMessage" property of the
 // posted message.
 const storageKey = 'settingsData'
 const defaultDisplayType = 'display-type-tile'
 const defaultSymbolType = 'symbol-type-sfsymbols'
-const defaultSettingsData = { clickAction: 'copy', displayType: defaultDisplayType, symbolType: defaultSymbolType }
+const defaultSettingsData = { clickAction: 'copy', displayType: defaultDisplayType, symbolType: defaultSymbolType, windowHeight: 600 }
 var settingsData = JSON.parse(JSON.stringify(defaultSettingsData));
 var textObjectLength = 0
 init()
@@ -34,6 +33,7 @@ function init(){
       figma.clientStorage.setAsync(storageKey, JSON.stringify(defaultSettingsData))
       settingsData = defaultSettingsData
     }
+    figma.ui.resize(370, parseInt(settingsData.windowHeight))
     figma.ui.postMessage({ settings : true, data : settingsData })
   })
 }
@@ -118,6 +118,9 @@ figma.ui.onmessage = message => {
       let num = pasteFunction(figma.currentPage.selection, message.copiedGlyph, message.symbolType)
     }
   }else if(message.updatedSettingsData){
+    if(settingsData.windowHeight != message.updatedSettingsData.windowHeight){
+      figma.ui.resize(370, parseInt(message.updatedSettingsData.windowHeight))
+    }
     settingsData = message.updatedSettingsData
     figma.clientStorage.setAsync(storageKey, JSON.stringify(message.updatedSettingsData))
   }
