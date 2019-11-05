@@ -1,6 +1,6 @@
-![Symbols Browser](assets/artwork.png)
+![Symbol Icons Browser](assets/artwork.png)
 
-Symbols Browser makes it easy to browse and copy symbols from SF Symbols & Material Icons font.
+Symbol Icons Browser makes it easy to browse and copy symbols from SF Symbols & Material Icons font.
 
 To use this plugin, Please install San Francisco font and Material Icons font (.ttf).
 
