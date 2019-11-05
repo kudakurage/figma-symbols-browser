@@ -380,6 +380,10 @@
       <span>Window height size:</span>
       <input id="settings-window-height" onchange="setWindowHeightSetting(this)" type="number" min="200" max="1000" />
     </div>
+    <div class="setting-item">
+      <span>Default font size:</span>
+      <input id="settings-font-size" onchange="setFontSizeSetting(this)" type="number" min="8" max="1000" />
+    </div>
     <div class="copyright"><a href="https://www.spinners.work/" target="_blank">Copyright © 2019 Spinners Inc.</a></div>
   </div>
 </div>
@@ -519,6 +523,17 @@ function setWindowHeightSetting(object){
   updateSettings()
 }
 
+function setFontSizeSetting(object){
+  if(object.value < 8){
+    object.value = 8
+  }
+  if(object.value > 1000){
+    object.value = 1000
+  }
+  settingsData.fontSize = object.value
+  updateSettings()
+}
+
 // send message update settings to code.ts
 function updateSettings(){
   parent.postMessage({ pluginMessage: { updatedSettingsData: settingsData } }, '*');
@@ -537,6 +552,8 @@ function settingsInit(){
   }
   let settingWindowHeight = document.getElementById('settings-window-height')
   settingWindowHeight.value = settingsData.windowHeight
+  let settingFontSize = document.getElementById('settings-font-size')
+  settingFontSize.value = settingsData.fontSize
 }
 
 // get display type list
