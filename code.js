@@ -19,7 +19,7 @@ figma.showUI(__html__);
 const storageKey = 'settingsData';
 const defaultDisplayType = 'display-type-tile';
 const defaultSymbolType = 'symbol-type-sfsymbols';
-const defaultSettingsData = { clickAction: 'copy', displayType: defaultDisplayType, symbolType: defaultSymbolType, windowHeight: 600 };
+const defaultSettingsData = { clickAction: 'copy', displayType: defaultDisplayType, symbolType: defaultSymbolType, windowHeight: 600, fontSize: 40 };
 var settingsData = JSON.parse(JSON.stringify(defaultSettingsData));
 var textObjectLength = 0;
 init();
@@ -50,13 +50,15 @@ function pasteFunction(nodeObjectsArray, copiedText, symbolType) {
                 updateText(nodeObjectsArray[i], copiedText, symbolType);
                 textObjectLength++;
             }
-            else if (nodeObjectsArray[i].type == 'GROUP' || nodeObjectsArray[i].type == 'FRAME' || nodeObjectsArray[i].type == 'COMPONENT' || nodeObjectsArray[i].type == 'INSTANCE') {
-                pasteFunction(nodeObjectsArray[i].children, copiedText, symbolType);
-            }
         }
         if (textObjectLength == 0) {
             // none
+            createTextAndPaste(copiedText, symbolType);
+            textObjectLength++;
         }
+    }
+    else {
+        createTextAndPaste(copiedText, symbolType);
     }
     return textObjectLength;
 }
@@ -123,10 +125,34 @@ function updateText(selectedItem, pasteValue, symbolType) {
         selectedItem.characters = pasteValue;
     });
 }
+function createTextAndPaste(pasteValue, symbolType) {
+    return __awaiter(this, void 0, void 0, function* () {
+        let tempFontName = { family: '', style: '' };
+        if (symbolType == "material-icons") {
+            tempFontName.family = 'Material Icons';
+            tempFontName.style = "Regular";
+        }
+        else {
+            tempFontName.family = 'SF Pro Display';
+            tempFontName.style = "Regular";
+        }
+        yield figma.loadFontAsync({ family: tempFontName.family, style: tempFontName.style });
+        const newTextNode = figma.createText();
+        newTextNode.fontName = tempFontName;
+        newTextNode.fontSize = Number(settingsData.fontSize);
+        newTextNode.characters = pasteValue;
+        newTextNode.x = figma.viewport.center.x - (newTextNode.width / 2);
+        newTextNode.y = figma.viewport.center.y - (newTextNode.height / 2);
+        figma.currentPage.appendChild(newTextNode);
+        figma.currentPage.selection = [newTextNode];
+        return newTextNode;
+    });
+}
 figma.ui.onmessage = message => {
     if (message.copied) {
         if (settingsData.clickAction == 'paste') {
             let num = pasteFunction(figma.currentPage.selection, message.copiedGlyph, message.symbolType);
+            textObjectLength = 0;
         }
     }
     else if (message.updatedSettingsData) {
