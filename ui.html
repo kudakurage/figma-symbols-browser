@@ -252,16 +252,16 @@
     vertical-align: bottom;
   }
   #symbols-category {
-    margin: -5px 0 0;
-    border-bottom: 1px solid #555;
+    margin: -5px 5px 0;
+    border-bottom: 1px solid #333;
   }
-  #category {
+  .category-select {
     line-height: 40px;
     height: 40px;
     font-size: 16px;
     border: 0;
     background: none;
-    width: 360px;
+    width: 350px;
     color: #fff;
     outline: none;
   }
@@ -369,7 +369,8 @@
   </div>
   <div id="toast-message">Toast Message</div>
   <div id="symbols-category">
-    <select id="category" onchange="filterBySearchAndCategory()"><option value="">All</option></select>
+    <select id="sf-category" class="category-select" onchange="filterBySearchAndCategory()"><option value="">All</option></select>
+    <select id="mi-category" class="category-select" onchange="filterBySearchAndCategory()"><option value="">All</option></select>
   </div>
   <div id="symbols-table" class="clearfix loading"></div>
   <div id="install-font" class="install-font hidden">
@@ -411,7 +412,7 @@
 <textarea></textarea>
 <script>
 const sfCsvFileName = 'https://raw.githubusercontent.com/kudakurage/figma-symbols-browser/master/assets/SFSymbols-1.1.csv'
-const miCsvFileName = 'https://raw.githubusercontent.com/kudakurage/figma-symbols-browser/master/assets/Material_Icons.csv'
+const miCsvFileName = 'https://raw.githubusercontent.com/kudakurage/figma-symbols-browser/master/assets/Material_Icons-1.1.csv'
 const mainView = document.getElementById('main-view')
 const settingsView = document.getElementById('settings-view')
 const symbolsTable = document.getElementById('symbols-table')
@@ -419,15 +420,17 @@ const navbar = document.getElementById('navbar')
 const installFont = document.getElementById('install-font')
 const searchField = document.getElementById('search')
 const searchReset = document.getElementById('search-reset')
-const categorySelector = document.getElementById('category')
+const sfCategorySelector = document.getElementById('sf-category')
+const miCategorySelector = document.getElementById('mi-category')
 const toastMessage = document.getElementById('toast-message')
 const displayTypeItem = document.getElementsByClassName('display-type-item')
 const displayTypeClassList = getDisplayTypeClassList()
 const symbolTypeItem = document.getElementsByClassName('symbol-type-item')
 const symbolTypeClassList = getSymbolTypeClassList()
 const sfCategories = ["communication","weather","objects & tools","devices","connectivity","transportation","human","nature","editing","text formatting","media","keyboard","commerce","time","health","shapes","arrows","indices","math"]
+const miCategories = ["action","alert","av","communication","content","device","editor","file","hardware","image","maps","navigation","notification","places","social","toggle"]
 var canUsePlugin = false
-var toastID = searchKeyword = currentCategory = ''
+var toastID = searchKeyword = sfCurrentCategory = miCurrentCategory = ''
 var masterDataSF = masterData = masterDataMI = []
 var settingsData = {}
 var installCheckMaterialFont = false
@@ -467,7 +470,13 @@ function init(){
     let categoryOption = document.createElement('option')
     categoryOption.setAttribute('value', sfCategories[i])
     categoryOption.textContent = capitalize(sfCategories[i])
-    document.getElementById('category').appendChild(categoryOption)
+    sfCategorySelector.appendChild(categoryOption)
+  }
+  for(let i = 0; i < miCategories.length; i++){
+    let categoryOption = document.createElement('option')
+    categoryOption.setAttribute('value', miCategories[i])
+    categoryOption.textContent = capitalize(miCategories[i])
+    miCategorySelector.appendChild(categoryOption)
   }
   document.getElementById('settings-button').addEventListener('click', function(e){
     mainView.classList.add('hidden')
@@ -531,9 +540,11 @@ function chnageSymbolType(targetId){
     document.getElementById('install-material-icons').classList.add('hidden')
   }
   if(targetId == 'symbol-type-sfsymbols'){
-    categorySelector.classList.remove('hidden')
+    sfCategorySelector.classList.remove('hidden')
+    miCategorySelector.classList.add('hidden')
   }else{
-    categorySelector.classList.add('hidden')
+    sfCategorySelector.classList.add('hidden')
+    miCategorySelector.classList.remove('hidden')
   }
   symbolsTable.classList.add(targetId)
   toastMessage.classList.add(targetId)
@@ -611,12 +622,14 @@ function getSymbolTypeClassList(){
 
 // search event
 function filterBySearchAndCategory(){
-  let filterCategory = categorySelector.options[categorySelector.selectedIndex].value
-  if(searchKeyword == searchField.value && currentCategory == filterCategory){
+  let sfFilterCategory = sfCategorySelector.options[sfCategorySelector.selectedIndex].value
+  let miFilterCategory = miCategorySelector.options[miCategorySelector.selectedIndex].value
+  if(searchKeyword == searchField.value && sfCurrentCategory == sfFilterCategory && miCurrentCategory == miFilterCategory){
     return false
   }else{
     searchKeyword = searchField.value
-    currentCategory = filterCategory
+    sfCurrentCategory = sfFilterCategory
+    miCurrentCategory = miFilterCategory
   }
   if(searchKeyword.length > 0){
     searchReset.classList.remove('hidden')
@@ -626,15 +639,26 @@ function filterBySearchAndCategory(){
   let wordArray = searchKeyword.split(/\s/)
 
   let filteredList = []
-  if(currentCategory){
-    let regex = new RegExp(filterCategory)
-    filteredList = masterDataSF.filter(function(value){
+  let sfFilteredList = []
+  let miFilteredList = []
+  if(sfCurrentCategory){
+    let regex = new RegExp(sfCurrentCategory)
+    sfFilteredList = masterDataSF.filter(function(value){
       return regex.test(value.category);
     })
-    filteredList = filteredList.concat(masterDataMI)
+    // filteredList = filteredList.concat(masterDataMI)
   }else{
-    filteredList = masterData
+    sfFilteredList = masterDataSF
   }
+  if(miCurrentCategory){
+    let regex = new RegExp(miCurrentCategory)
+    miFilteredList = masterDataMI.filter(function(value){
+      return regex.test(value.category);
+    })
+  }else{
+    miFilteredList = masterDataMI
+  }
+  filteredList = sfFilteredList.concat(miFilteredList)
 
   for(let i = 0; i < wordArray.length; i++){
     filteredList = filteringList(filteredList, wordArray[i])
@@ -772,7 +796,7 @@ function csv2json(csv, type){
       master_line.search_keyword = a_line.short_name
       master_line.symbol_type = "material-icons"
       master_line.character = a_line.character
-      master_line.category = null
+      master_line.category = a_line.categories
     }
     jsonArray.push(master_line)
   }
