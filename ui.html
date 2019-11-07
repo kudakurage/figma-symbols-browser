@@ -3,7 +3,7 @@
     font-family: 'SF Pro Display', 'SF Compact Display', sans-serif;
     background: #222;
     margin: 0;
-    padding: 20px 5px;
+    padding: 50px 5px 20px;
     font-size: 16px;
     color: #fff;
   }
@@ -113,7 +113,7 @@
     color: #222;
   }
   #symbols-table {
-    padding: 35px 0 0;
+    padding: 10px 0 0;
     user-select: none;
   }
   .symbol-item {
@@ -251,6 +251,20 @@
     font-family: 'Material Icons';
     vertical-align: bottom;
   }
+  #symbols-category {
+    margin: -5px 0 0;
+    border-bottom: 1px solid #555;
+  }
+  #category {
+    line-height: 40px;
+    height: 40px;
+    font-size: 16px;
+    border: 0;
+    background: none;
+    width: 360px;
+    color: #fff;
+    outline: none;
+  }
   .install-font {
     padding: 30px 10px;
   }
@@ -346,11 +360,14 @@
       <div id="display-type-tile" class="display-type-item active">􀛧</div>
       <div id="display-type-list" class="display-type-item">􀋱</div>
     </div>
-    <input type="text" id="search" placeholder="􀊫 search" />
+    <input type="text" id="search" placeholder="􀊫 search" onkeyup="filterBySearchAndCategory()" />
     <div id="search-reset" class="hidden" onclick="resetSearch()">􀁑</div>
     <div id="settings-button">􀍠</div>
   </div>
   <div id="toast-message">Toast Message</div>
+  <div id="symbols-category">
+    <select id="category" onchange="filterBySearchAndCategory()"><option value="">All</option></select>
+  </div>
   <div id="symbols-table" class="clearfix loading"></div>
   <div id="install-font" class="install-font hidden">
     <p class="title">Please install San Francisco fonts to use this plugin.</p>
@@ -389,7 +406,7 @@
 </div>
 <textarea></textarea>
 <script>
-const sfCsvFileName = 'https://raw.githubusercontent.com/kudakurage/figma-symbols-browser/master/assets/SFSymbols.csv'
+const sfCsvFileName = 'https://raw.githubusercontent.com/kudakurage/figma-symbols-browser/master/assets/SFSymbols-1.1.csv'
 const miCsvFileName = 'https://raw.githubusercontent.com/kudakurage/figma-symbols-browser/master/assets/Material_Icons.csv'
 const mainView = document.getElementById('main-view')
 const settingsView = document.getElementById('settings-view')
@@ -398,13 +415,15 @@ const navbar = document.getElementById('navbar')
 const installFont = document.getElementById('install-font')
 const searchField = document.getElementById('search')
 const searchReset = document.getElementById('search-reset')
+const categorySelector = document.getElementById('category')
 const toastMessage = document.getElementById('toast-message')
 const displayTypeItem = document.getElementsByClassName('display-type-item')
 const displayTypeClassList = getDisplayTypeClassList()
 const symbolTypeItem = document.getElementsByClassName('symbol-type-item')
 const symbolTypeClassList = getSymbolTypeClassList()
+const sfCategories = ["communication","weather","objects & tools","devices","connectivity","transportation","human","nature","editing","text formatting","media","keyboard","commerce","time","health","shapes","arrows","indices","math"]
 var canUsePlugin = false
-var toastID = searchKeyword = ''
+var toastID = searchKeyword = currentCategory = ''
 var masterDataSF = masterData = masterDataMI = []
 var settingsData = {}
 var installCheckMaterialFont = false
@@ -425,7 +444,6 @@ window.onload = function () {
   }
 };
 
-
 function init(){
   symbolsTable.classList.remove('hidden')
   navbar.classList.remove('hidden')
@@ -440,6 +458,12 @@ function init(){
       chnageSymbolType(e.target.getAttribute('id'))
       updateSettings()
     }, false)
+  }
+  for(let i = 0; i < sfCategories.length; i++){
+    let categoryOption = document.createElement('option')
+    categoryOption.setAttribute('value', sfCategories[i])
+    categoryOption.textContent = capitalize(sfCategories[i])
+    document.getElementById('category').appendChild(categoryOption)
   }
   document.getElementById('settings-button').addEventListener('click', function(e){
     mainView.classList.add('hidden')
@@ -502,6 +526,11 @@ function chnageSymbolType(targetId){
   }else{
     document.getElementById('install-material-icons').classList.add('hidden')
   }
+  if(targetId == 'symbol-type-sfsymbols'){
+    categorySelector.classList.remove('hidden')
+  }else{
+    categorySelector.classList.add('hidden')
+  }
   symbolsTable.classList.add(targetId)
   toastMessage.classList.add(targetId)
 }
@@ -512,6 +541,7 @@ function setClickActionSetting(object){
   updateSettings()
 }
 
+// set window height size setting
 function setWindowHeightSetting(object){
   if(object.value < 200){
     object.value = 200
@@ -523,6 +553,7 @@ function setWindowHeightSetting(object){
   updateSettings()
 }
 
+// set default font size setting
 function setFontSizeSetting(object){
   if(object.value < 8){
     object.value = 8
@@ -574,33 +605,44 @@ function getSymbolTypeClassList(){
   return classList
 }
 
-// set up search event
-function setupSearch(){
-  searchField.addEventListener('keyup', function(){
-    if(searchKeyword == searchField.value){
-      return false
-    }else{
-      searchKeyword = searchField.value
-    }
-    if(searchKeyword.length > 0){
-      searchReset.classList.remove('hidden')
-    }else{
-      searchReset.classList.add('hidden')
-    }
-    let wordArray = searchKeyword.split(/\s/)
-    let filteredList = masterData
-    for(let i = 0; i < wordArray.length; i++){
-      filteredList = filteringList(filteredList, wordArray[i])
-    }
-    createGlyphList(filteredList)
-  })
+// search event
+function filterBySearchAndCategory(){
+  let filterCategory = categorySelector.options[categorySelector.selectedIndex].value
+  if(searchKeyword == searchField.value && currentCategory == filterCategory){
+    return false
+  }else{
+    searchKeyword = searchField.value
+    currentCategory = filterCategory
+  }
+  if(searchKeyword.length > 0){
+    searchReset.classList.remove('hidden')
+  }else{
+    searchReset.classList.add('hidden')
+  }
+  let wordArray = searchKeyword.split(/\s/)
+
+  let filteredList = []
+  if(currentCategory){
+    let regex = new RegExp(filterCategory)
+    filteredList = masterDataSF.filter(function(value){
+      return regex.test(value.category);
+    })
+    filteredList = filteredList.concat(masterDataMI)
+  }else{
+    filteredList = masterData
+  }
+
+  for(let i = 0; i < wordArray.length; i++){
+    filteredList = filteringList(filteredList, wordArray[i])
+  }
+  createGlyphList(filteredList)
 }
 
 // Reset search word 
 function resetSearch(){
   searchField.value = ""
   searchReset.classList.add('hidden')
-  createGlyphList(masterData)
+  filterBySearchAndCategory()
 }
 
 // filter symbols list with search word
@@ -610,6 +652,18 @@ function filteringList(list, filterWord){
     return regex.test(value.search_keyword);
   })
   return filteredList
+}
+
+// filter symbols list with category
+function filterByCategory(object){
+  let filterCategory = object.options[object.selectedIndex].value
+  let regex = new RegExp(filterCategory)
+  let filteredList = masterDataSF.filter(function(value){
+    return regex.test(value.category);
+  })
+  filteredList = filteredList.concat(masterDataMI)
+  return filteredList
+
 }
 
 // copy glyph to clipboard
@@ -632,6 +686,7 @@ function copyGlyph(event){
 function createGlyphList(data){
   symbolsTable.innerHTML = ''
   data.forEach(val => {
+    // console.log(val.character)
     let divWrapper = document.createElement('div')
     let divGlyph = document.createElement('div')
     let divName = document.createElement('div')
@@ -645,6 +700,7 @@ function createGlyphList(data){
     divWrapper.setAttribute('data-glyph', val.character)
     divWrapper.setAttribute('data-symbol-type', val.symbol_type)
     divWrapper.setAttribute('data-keyword', val.search_keyword)
+    divWrapper.setAttribute('data-category', val.category)
     divWrapper.addEventListener('click', function(e){copyGlyph(e)}, false)
     symbolsTable.appendChild(divWrapper)
   })
@@ -677,7 +733,6 @@ function getCSV(){
       masterData = masterDataSF.concat(masterDataMI)
       symbolsTable.classList.remove('loading')
       createGlyphList(masterData)
-      setupSearch()
     })
   })
 }
@@ -697,27 +752,40 @@ function csv2json(csv, type){
       a_line[items[j]] = csvArrayD[j]
     }
 
-    if(type == "SF" && a_line.ready_for_api == "FALSE"){
-      continue;
-    }
-    if(type == "SF" && a_line.blacklist_apple_only == "TRUE"){
-      continue;
-    }
-
     if(type == "SF"){
       master_line.short_name = a_line.short_name.replace(/[\.\_]/g, ' ')
-      master_line.search_keyword = a_line.short_name+';'+a_line.apple_action+';'+a_line.apple_entity+';'+a_line.semantic_name_1+';'+a_line.semantic_name_2+';'+a_line.semantic_name_3
+      master_line.search_keyword = a_line.short_name+';'+a_line.additional_search_metadata+';'+a_line.semantic_name_1+';'+a_line.semantic_name_2+';'+a_line.semantic_name_3
       master_line.symbol_type = "sf-symbols"
-      master_line.character = a_line.character_auto ? a_line.character_auto : a_line.character
+      master_line.character = a_line.character
+      master_line.category = a_line.categories
     }else{
       master_line.short_name = a_line.short_name.replace(/[\.\_]/g, ' ')
       master_line.search_keyword = a_line.short_name
       master_line.symbol_type = "material-icons"
       master_line.character = a_line.character
+      master_line.category = null
     }
     jsonArray.push(master_line)
   }
   return jsonArray
+}
+
+// uppercase first glyph of the word
+function capitalize(str){
+  console.log(str)
+  let words = str.split(' ')
+  let capitalize_word = ''
+  if(words.length > 1){
+    for(let i = 0; i < words.length; i++){
+      if(capitalize_word){
+        capitalize_word += ' '
+      }
+      capitalize_word += words[i].charAt(0).toUpperCase() + words[i].slice(1).toLowerCase()
+    }
+  }else{
+    capitalize_word = str.charAt(0).toUpperCase() + str.slice(1).toLowerCase()
+  }
+  return capitalize_word
 }
 
 /**
