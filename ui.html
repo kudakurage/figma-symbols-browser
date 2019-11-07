@@ -315,6 +315,7 @@
   }
   #settings-body {
     padding: 40px 15px;
+    font-size: 14px;
   }
   #settings-body .setting-item {
     margin-bottom: 20px;
@@ -323,17 +324,19 @@
   }
   #settings-body .setting-item span {
     display: inline-block;
-    width: 145px;
+    width: 125px;
     user-select: none;
   }
   #settings-body select {
-    width: 180px;
+    width: 200px;
     height: 28px;
+    font-size: 15px;
   }
   #settings-body input {
-    width: 180px;
+    width: 200px;
     padding: 5px;
     border-radius: 5px;
+    font-size: 15px;
   }
   .copyright {
       font-size: 11px;
@@ -389,9 +392,9 @@
     <div class="setting-item">
       <span>When click symbols:</span>
       <select id="settings-click-action" onchange="setClickActionSetting(this)">
-        <option value="create">Create new symbol object (not copy)</option>
+        <option value="create">Create new text object (not copy)</option>
         <option value="copy">Copy to Clipboard</option>
-        <option value="paste">Copy & Paste to selected text</option>
+        <option value="paste">Copy & Paste to selected text objects</option>
       </select>
     </div>
     <div class="setting-item">

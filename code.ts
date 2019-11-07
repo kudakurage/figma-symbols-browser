@@ -144,13 +144,13 @@ async function createTextAndPaste(pasteValue, symbolType) {
 
 figma.ui.onmessage = message => {
   if (message.copied) {
-    console.log(settingsData.clickAction)
+    // console.log(settingsData.clickAction)
     if (settingsData.clickAction == 'paste'){
       let num = pasteFunction(figma.currentPage.selection, message.copiedGlyph, message.symbolType)
       textObjectLength = 0
     }
     if (settingsData.clickAction == 'create'){
-      console.log(settingsData.clickAction)
+      // console.log(settingsData.clickAction)
       let num = createFunction(message.copiedGlyph, message.symbolType)
       textObjectLength = 0
     }
