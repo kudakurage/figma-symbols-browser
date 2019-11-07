@@ -55,15 +55,20 @@ function pasteFunction(nodeObjectsArray, copiedText, symbolType) {
             // none
             createTextAndPaste(copiedText, symbolType);
             textObjectLength++;
+            figma.notify('Copy & Create symbol glyph object!');
+        }
+        else {
+            figma.notify('Copy & Paste symbol glyph to selected text objects!');
         }
     }
     else {
         createTextAndPaste(copiedText, symbolType);
+        figma.notify('Create symbol glyph object!');
     }
     return textObjectLength;
 }
 function createFunction(copiedText, symbolType) {
-    console.log('createFunction');
+    // console.log('createFunction')
     createTextAndPaste(copiedText, symbolType);
     return textObjectLength;
 }
@@ -156,6 +161,9 @@ function createTextAndPaste(pasteValue, symbolType) {
 figma.ui.onmessage = message => {
     if (message.copied) {
         // console.log(settingsData.clickAction)
+        if (settingsData.clickAction == 'copy') {
+            figma.notify('Copy symbol glyph to clipboard!');
+        }
         if (settingsData.clickAction == 'paste') {
             let num = pasteFunction(figma.currentPage.selection, message.copiedGlyph, message.symbolType);
             textObjectLength = 0;
@@ -164,6 +172,7 @@ figma.ui.onmessage = message => {
             // console.log(settingsData.clickAction)
             let num = createFunction(message.copiedGlyph, message.symbolType);
             textObjectLength = 0;
+            figma.notify('Create symbol glyph object!');
         }
     }
     else if (message.updatedSettingsData) {
