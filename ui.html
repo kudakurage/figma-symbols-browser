@@ -389,6 +389,7 @@
     <div class="setting-item">
       <span>When click symbols:</span>
       <select id="settings-click-action" onchange="setClickActionSetting(this)">
+        <option value="create">Create new symbol object (not copy)</option>
         <option value="copy">Copy to Clipboard</option>
         <option value="paste">Copy & Paste to selected text</option>
       </select>
@@ -666,16 +667,21 @@ function filterByCategory(object){
 
 }
 
-// copy glyph to clipboard
-function copyGlyph(event){
+// click glyph action
+function clickGlyph(event){
   let glyph = event.target.getAttribute('data-glyph')
   let symbolType = event.target.getAttribute('data-symbol-type')
   let textarea = document.getElementsByTagName("textarea")[0]
-  textarea.value = glyph
-  textarea.select()
-  document.execCommand("copy")
+  let message = ''
   window.clearTimeout(toastID)
-  let message = settingsData.clickAction == 'copy' ? 'Copied symbols' : 'Copied & Pasted symbols'
+  if(settingsData.clickAction != 'create'){
+    textarea.value = glyph
+    textarea.select()
+    document.execCommand("copy")
+    message = settingsData.clickAction == 'copy' ? 'Copied symbol' : 'Copied & Pasted symbol'
+  }else{
+    message = 'Create new symbol object'
+  }
   toastMessage.innerHTML = message+': <span>'+glyph+'</span>'
   toastMessage.classList.add('show')
   toastID = window.setTimeout(function(){toastMessage.classList.remove('show')}, 2000)
@@ -701,7 +707,7 @@ function createGlyphList(data){
     divWrapper.setAttribute('data-symbol-type', val.symbol_type)
     divWrapper.setAttribute('data-keyword', val.search_keyword)
     divWrapper.setAttribute('data-category', val.category)
-    divWrapper.addEventListener('click', function(e){copyGlyph(e)}, false)
+    divWrapper.addEventListener('click', function(e){clickGlyph(e)}, false)
     symbolsTable.appendChild(divWrapper)
   })
 }
@@ -772,7 +778,7 @@ function csv2json(csv, type){
 
 // uppercase first glyph of the word
 function capitalize(str){
-  console.log(str)
+  // console.log(str)
   let words = str.split(' ')
   let capitalize_word = ''
   if(words.length > 1){

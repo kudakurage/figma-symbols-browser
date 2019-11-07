@@ -13,7 +13,7 @@ figma.showUI(__html__)
 const storageKey = 'settingsData'
 const defaultDisplayType = 'display-type-tile'
 const defaultSymbolType = 'symbol-type-sfsymbols'
-const defaultSettingsData = { clickAction: 'copy', displayType: defaultDisplayType, symbolType: defaultSymbolType, windowHeight: 600, fontSize: 40 }
+const defaultSettingsData = { clickAction: 'create', displayType: defaultDisplayType, symbolType: defaultSymbolType, windowHeight: 600, fontSize: 40 }
 var settingsData = JSON.parse(JSON.stringify(defaultSettingsData));
 var textObjectLength = 0
 init()
@@ -54,6 +54,12 @@ function pasteFunction(nodeObjectsArray, copiedText, symbolType){
   }else{
     createTextAndPaste(copiedText, symbolType)
   }
+  return textObjectLength
+}
+
+function createFunction(copiedText, symbolType){
+  console.log('createFunction')
+  createTextAndPaste(copiedText, symbolType)
   return textObjectLength
 }
 
@@ -138,8 +144,14 @@ async function createTextAndPaste(pasteValue, symbolType) {
 
 figma.ui.onmessage = message => {
   if (message.copied) {
+    console.log(settingsData.clickAction)
     if (settingsData.clickAction == 'paste'){
       let num = pasteFunction(figma.currentPage.selection, message.copiedGlyph, message.symbolType)
+      textObjectLength = 0
+    }
+    if (settingsData.clickAction == 'create'){
+      console.log(settingsData.clickAction)
+      let num = createFunction(message.copiedGlyph, message.symbolType)
       textObjectLength = 0
     }
   }else if(message.updatedSettingsData){
