@@ -16,7 +16,7 @@
     display: none;
   }
   .loading {
-    background-image: url('https://raw.githubusercontent.com/kudakurage/figma-symbols-browser/master/assets/loading.gif');
+    background-image: url('https://raw.githubusercontent.com/kudakurage/figma-symbols-browser/master/assets/images/loading.gif');
     background-position: center center;
     background-repeat: no-repeat;
     min-height: 200px;
@@ -62,7 +62,7 @@
   #search {
     float: left;
     font-size: 15px;
-    width: 160px;
+    width: 130px;
     height: 30px;
     line-height: 30px;
     margin-right: 4px;
@@ -107,10 +107,21 @@
   #display-type div:last-child {
     border-radius: 0 4px 4px 0;
   }
+
+  #symbol-type svg,
+  #display-type svg {
+    fill: #fff;
+    padding-top: 5px;
+    pointer-events: none;
+  }
   #symbol-type .active,
   #display-type .active {
     background: #aaa;
     color: #222;
+  }
+  #symbol-type .active svg,
+  #display-type .active svg {
+    fill: #222;
   }
   #symbols-table {
     padding: 10px 0 0;
@@ -155,10 +166,15 @@
     pointer-events: none;
   }
   #symbols-table.symbol-type-material .sf-symbols,
-  #symbols-table.symbol-type-sfsymbols .material-icons {
+  #symbols-table.symbol-type-fontawesome .sf-symbols,
+  #symbols-table.symbol-type-sfsymbols .material-icons,
+  #symbols-table.symbol-type-fontawesome .material-icons,
+  #symbols-table.symbol-type-sfsymbols .font-awesome,
+  #symbols-table.symbol-type-material .font-awesome {
     display: none;
   }
-  .material-icons-hidden #symbols-table .material-icons {
+  .material-icons-hidden #symbols-table .material-icons,
+  .font-awesome-hidden #symbols-table .font-awesome {
     display: none;
   }
   .display-type-symbols .symbol-item {
@@ -172,6 +188,7 @@
     width: 60px;
     font-size: 24px;
     line-height: 50px;
+    overflow: hidden;
   }
   .display-type-symbols .symbol-item-name {
     display: none;
@@ -219,6 +236,12 @@
     font-family: 'Material Icons';
     font-size: 36px;
   }
+  .font-awesome .symbol-item-glyph {
+    font-family: 'FontAwesome', 'Font Awesome 5 Free', 'Font Awesome 5 Brands';
+  }
+  .font-awesome.symbol-style-solid .symbol-item-glyph {
+    font-weight: bold;
+  }
   .display-type-symbols .material-icons .symbol-item-glyph {
     font-size: 28px;
   }
@@ -251,6 +274,9 @@
     font-family: 'Material Icons';
     vertical-align: bottom;
   }
+  #toast-message.symbol-type-fontawesome span {
+    font-family: 'FontAwesome', 'Font Awesome 5 Free', 'Font Awesome 5 Brands';
+  }
   #symbols-category {
     margin: -5px 5px 0;
     border-bottom: 1px solid #333;
@@ -269,14 +295,15 @@
     padding: 30px 10px;
   }
   .install-font .title {
-    font-size: 18px;
+    font-size: 17px;
     font-weight: bold;
-    margin-bottom: 0;
+    line-height: 1.4;
+    margin: 20px 0;
   }
   .install-font .subtle {
-    font-size: 13px;
+    font-size: 15px;
     color: #666;
-    margin-bottom: 30px;
+    margin-bottom: 20px;
   }
   .install-font .button {
     display: block;
@@ -304,6 +331,12 @@
     text-align: center;
     cursor: pointer;
     border-radius: 5px;
+  }
+  #settings-button svg,
+  #settings-close svg {
+    fill: #fff;
+    padding-top: 5px;
+    pointer-events: none;
   }
   #settings-button:hover,
   #settings-close:hover {
@@ -355,39 +388,48 @@
 <div id="main-view">
   <div id="navbar">
     <div id="symbol-type" class="clearfix">
-      <div id="symbol-type-sfsymbols" class="symbol-type-item active"></div>
-      <div id="symbol-type-material" class="symbol-type-item">G</div>
+      <div id="symbol-type-sfsymbols" class="symbol-type-item active"><svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M15.168 9.72c0-1.517.697-2.624 2.05-3.486-.779-1.107-1.927-1.681-3.445-1.804-1.476-.123-3.076.82-3.65.82-.615 0-2.01-.78-3.117-.78-2.297.042-4.717 1.805-4.717 5.456 0 1.066.164 2.174.574 3.322.533 1.518 2.42 5.209 4.389 5.127 1.025 0 1.764-.738 3.117-.738 1.313 0 1.969.738 3.117.738 2.01 0 3.733-3.363 4.225-4.88-2.666-1.272-2.543-3.692-2.543-3.774zm-2.297-6.726c1.107-1.312.984-2.543.984-2.994-.984.082-2.132.697-2.789 1.436-.738.82-1.148 1.845-1.066 2.953 1.066.082 2.05-.452 2.871-1.395z"/></svg></div>
+      <div id="symbol-type-material" class="symbol-type-item"><svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M18.203 10.434c0-.532-.066-.93-.133-1.362h-7.836v2.823h4.649c-.166 1.228-1.395 3.552-4.649 3.552-2.822 0-5.113-2.324-5.113-5.213 0-4.615 5.445-6.74 8.367-3.918l2.258-2.158A7.986 7.986 0 0 0 10.234 2 8.212 8.212 0 0 0 2 10.234a8.19 8.19 0 0 0 8.234 8.235c4.748 0 7.97-3.32 7.97-8.035z"/></svg></div>
+      <div id="symbol-type-fontawesome" class="symbol-type-item"><svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M17.643 13.953V5.951c0-.232-.233-.431-.498-.431-.366 0-1.793.93-3.088.93-.963 0-2.026-.93-4.217-.93-1.86 0-3.652.896-3.785.962V5.42c.465-.332.73-.897.73-1.494C6.785 2.863 5.955 2 4.893 2 3.83 2 3 2.863 3 3.926c0 .597.299 1.162.73 1.494V17.87c0 .631.499 1.129 1.163 1.129.597 0 1.128-.432 1.128-1.129v-2.59c.067-.033.133-.033.2-.066 1.129-.531 2.523-.996 3.851-.996 1.826 0 2.524.963 4.051.963 1.096 0 2.125-.366 3.088-.797.232-.1.432-.2.432-.432z"/></svg></div>
     </div>
     <div id="display-type" class="clearfix">
-      <div id="display-type-symbols" class="display-type-item">􀇹</div>
-      <div id="display-type-tile" class="display-type-item active">􀛧</div>
-      <div id="display-type-list" class="display-type-item">􀋱</div>
+      <div id="display-type-symbols" class="display-type-item"><svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" clip-rule="evenodd" d="M2 3a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1v2a1 1 0 0 1-1 1H3a1 1 0 0 1-1-1V3zm0 6a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1v2a1 1 0 0 1-1 1H3a1 1 0 0 1-1-1V9zm1 5a1 1 0 0 0-1 1v2a1 1 0 0 0 1 1h2a1 1 0 0 0 1-1v-2a1 1 0 0 0-1-1H3zM8 3a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1v2a1 1 0 0 1-1 1H9a1 1 0 0 1-1-1V3zm1 5a1 1 0 0 0-1 1v2a1 1 0 0 0 1 1h2a1 1 0 0 0 1-1V9a1 1 0 0 0-1-1H9zm-1 7a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1v2a1 1 0 0 1-1 1H9a1 1 0 0 1-1-1v-2zm7-13a1 1 0 0 0-1 1v2a1 1 0 0 0 1 1h2a1 1 0 0 0 1-1V3a1 1 0 0 0-1-1h-2zm-1 7a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1v2a1 1 0 0 1-1 1h-2a1 1 0 0 1-1-1V9zm1 5a1 1 0 0 0-1 1v2a1 1 0 0 0 1 1h2a1 1 0 0 0 1-1v-2a1 1 0 0 0-1-1h-2z"/></svg></div>
+      <div id="display-type-tile" class="display-type-item active"><svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" clip-rule="evenodd" d="M3 2a1 1 0 0 0-1 1v5a1 1 0 0 0 1 1h5a1 1 0 0 0 1-1V3a1 1 0 0 0-1-1H3zm0 9a1 1 0 0 0-1 1v5a1 1 0 0 0 1 1h5a1 1 0 0 0 1-1v-5a1 1 0 0 0-1-1H3zm8-8a1 1 0 0 1 1-1h5a1 1 0 0 1 1 1v5a1 1 0 0 1-1 1h-5a1 1 0 0 1-1-1V3zm1 8a1 1 0 0 0-1 1v5a1 1 0 0 0 1 1h5a1 1 0 0 0 1-1v-5a1 1 0 0 0-1-1h-5z"/></svg></div>
+      <div id="display-type-list" class="display-type-item"><svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M4.156 13.815H2.031a.546.546 0 0 0-.531.531v2.125c0 .299.232.531.531.531h2.125a.546.546 0 0 0 .532-.53v-2.126c0-.265-.266-.531-.532-.531zm0-10.625H2.031a.546.546 0 0 0-.531.531v2.125c0 .299.232.531.531.531h2.125a.546.546 0 0 0 .532-.53V3.72c0-.265-.266-.531-.532-.531zm0 5.312H2.031a.546.546 0 0 0-.531.532v2.125c0 .298.232.53.531.53h2.125a.546.546 0 0 0 .532-.53V9.034c0-.266-.266-.532-.532-.532zm13.813 5.844H7.344a.546.546 0 0 0-.532.531v1.063c0 .299.233.531.532.531h10.625a.546.546 0 0 0 .531-.531v-1.063c0-.265-.266-.53-.531-.53zm0-10.625H7.344a.546.546 0 0 0-.532.531v1.063c0 .299.233.531.532.531h10.625a.546.546 0 0 0 .531-.531V4.252c0-.265-.266-.53-.531-.53zm0 5.313H7.344a.546.546 0 0 0-.532.53v1.063c0 .3.233.532.532.532h10.625a.546.546 0 0 0 .531-.532V9.565c0-.266-.266-.531-.531-.531z"/></svg></div>
     </div>
     <input type="text" id="search" placeholder="􀊫 search" onkeyup="filterBySearchAndCategory()" />
     <div id="search-reset" class="hidden" onclick="resetSearch()">􀁑</div>
-    <div id="settings-button">􀍠</div>
+    <div id="settings-button"><svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M5.475 10.015c0-.921-.747-1.66-1.685-1.66a1.66 1.66 0 1 0 0 3.32c.938 0 1.685-.739 1.685-1.66zm6.142 0c0-.921-.739-1.66-1.66-1.66-.913 0-1.652.739-1.652 1.66 0 .921.739 1.66 1.652 1.66.921 0 1.66-.739 1.66-1.66zm6.168 0c0-.921-.74-1.66-1.66-1.66-.938 0-1.677.739-1.677 1.66 0 .921.739 1.66 1.677 1.66.92 0 1.66-.739 1.66-1.66z"/></svg></div>
   </div>
   <div id="toast-message">Toast Message</div>
   <div id="symbols-category">
-    <select id="sf-category" class="category-select" onchange="filterBySearchAndCategory()"><option value="">All</option></select>
-    <select id="mi-category" class="category-select" onchange="filterBySearchAndCategory()"><option value="">All</option></select>
+    <select id="sf-category" class="category-select hidden" onchange="filterBySearchAndCategory()"><option value="">All</option></select>
+    <select id="mi-category" class="category-select hidden" onchange="filterBySearchAndCategory()"><option value="">All</option></select>
+    <select id="fa-category" class="category-select hidden" onchange="filterBySearchAndCategory()"><option value="">All</option></select>
   </div>
   <div id="symbols-table" class="clearfix loading"></div>
   <div id="install-font" class="install-font hidden">
     <p class="title">Please install San Francisco fonts to use this plugin.</p>
-    <p class="subtle">(Run this plugin again after installing the fonts.)</p>
+    <!-- <p class="subtle">(Run this plugin again after installing the fonts.)</p> -->
     <a href="https://developer.apple.com/fonts/" target="_blank" class="button">Download Page</a>
+    <span class="reload-button" onclick="reloadFont()">Reload after install/unistall font</span>
   </div>
   <div id="install-material-icons" class="install-font hidden">
     <p class="title">Please install 'MaterialIcons-Regular.ttf' to display Material Icons.</p>
-    <p class="subtle">(Run this plugin again after installing the font.)</p>
+    <p class="subtle">(Relaunch Figma app again after installing the font.)</p>
     <!-- <a href="https://github.com/google/material-design-icons" target="_blank" class="button">Download Page</a> -->
     <a href="https://github.com/jossef/material-design-icons-iconfont" target="_blank" class="button">Download Page</a>
+  </div>
+  <div id="install-font-awesome" class="install-font hidden">
+    <p class="title">Please install Font Awesome (OTF).<br />✓ Font Awesome 5 Brands-Regular-400.otf<br />✓ Font Awesome 5 Free-Regular-400.otf<br />✓ Font Awesome 5 Free-Solid-900.otf</p>
+    <p class="subtle">(Relaunch Figma app again after installing the font.)</p>
+    <!-- <a href="https://fontawesome.com/how-to-use/on-the-web/setup/hosting-font-awesome-yourself" target="_blank" class="button">Download Page</a> -->
+    <a href="https://github.com/FortAwesome/Font-Awesome" target="_blank" class="button">Download Page</a>
   </div>
 </div>
 <div id="settings-view" class="hidden">
   <div id="settings-navbar">
-    <div id="settings-close">􀅾</div>
+    <div id="settings-close"><svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M12.334 9.979l3.516-3.516a1.044 1.044 0 0 0 0-1.547l-.774-.773a1.044 1.044 0 0 0-1.547 0l-3.515 3.515-3.551-3.515a1.044 1.044 0 0 0-1.547 0l-.773.773a1.044 1.044 0 0 0 0 1.547L7.658 9.98l-3.515 3.55a1.044 1.044 0 0 0 0 1.547l.773.774a1.044 1.044 0 0 0 1.547 0l3.55-3.516 3.516 3.516a1.044 1.044 0 0 0 1.547 0l.774-.774a1.044 1.044 0 0 0 0-1.546l-3.516-3.551z"/></svg></div>
     Settings
   </div>
   <div id="settings-body">
@@ -412,8 +454,9 @@
 </div>
 <textarea></textarea>
 <script>
-const sfCsvFileName = 'https://raw.githubusercontent.com/kudakurage/figma-symbols-browser/master/assets/SFSymbols-1.1.csv'
-const miCsvFileName = 'https://raw.githubusercontent.com/kudakurage/figma-symbols-browser/master/assets/Material_Icons-2.csv'
+const sfCsvFileName = 'https://raw.githubusercontent.com/kudakurage/figma-symbols-browser/master/assets/csv/SFSymbols-1.1.csv'
+const miCsvFileName = 'https://raw.githubusercontent.com/kudakurage/figma-symbols-browser/master/assets/csv/Material_Icons-2.csv'
+const faCsvFileName = 'https://raw.githubusercontent.com/kudakurage/figma-symbols-browser/master/assets/csv/font-awesome-5.11.2.csv'
 const mainView = document.getElementById('main-view')
 const settingsView = document.getElementById('settings-view')
 const symbolsTable = document.getElementById('symbols-table')
@@ -421,8 +464,10 @@ const navbar = document.getElementById('navbar')
 const installFont = document.getElementById('install-font')
 const searchField = document.getElementById('search')
 const searchReset = document.getElementById('search-reset')
+const categorySelectorItem = document.getElementsByClassName('category-select')
 const sfCategorySelector = document.getElementById('sf-category')
 const miCategorySelector = document.getElementById('mi-category')
+const faCategorySelector = document.getElementById('fa-category')
 const toastMessage = document.getElementById('toast-message')
 const displayTypeItem = document.getElementsByClassName('display-type-item')
 const displayTypeClassList = getDisplayTypeClassList()
@@ -430,11 +475,13 @@ const symbolTypeItem = document.getElementsByClassName('symbol-type-item')
 const symbolTypeClassList = getSymbolTypeClassList()
 const sfCategories = ["communication","weather","objects & tools","devices","connectivity","transportation","human","nature","editing","text formatting","media","keyboard","commerce","time","health","shapes","arrows","indices","math"]
 const miCategories = ["action","alert","av","communication","content","device","editor","file","hardware","image","maps","navigation","notification","places","social","toggle"]
+const faCategories = ["accessibility","alert","animals","arrows","audio & video","automotive","autumn","beverage","brand logos","buildings","business","camping","charity","chat","chess","childhood","clothing","code","communication","computers","construction","currency","date & time","design","editors","education","emoji","energy","files","finance","fitness","food","fruit & vegetable","games","tabletop gaming","gender","halloween","hands","health","holiday","hotel","household","images","interfaces","logistics","maps","maritime","marketing","mathematics","medical","moving","music","objects","payments & shopping","pharmacy","political","religion","science","science fiction","security","shapes","shopping","social","spinners","sports","spring","status","summer","toggle","travel","users & people","vehicles","weather","winter","writing"]
 var canUsePlugin = false
-var toastID = searchKeyword = sfCurrentCategory = miCurrentCategory = ''
-var masterDataSF = masterData = masterDataMI = []
+var toastID = searchKeyword = sfCurrentCategory = miCurrentCategory = faCurrentCategory = ''
+var masterDataSF = masterData = masterDataMI = masterDataFA = []
 var settingsData = {}
 var installCheckMaterialFont = false
+var installCheckFontAwesome = false
 
 symbolsTable.classList.add('hidden')
 navbar.classList.add('hidden')
@@ -478,6 +525,12 @@ function init(){
     categoryOption.setAttribute('value', miCategories[i])
     categoryOption.textContent = capitalize(miCategories[i])
     miCategorySelector.appendChild(categoryOption)
+  }
+  for(let i = 0; i < faCategories.length; i++){
+    let categoryOption = document.createElement('option')
+    categoryOption.setAttribute('value', faCategories[i])
+    categoryOption.textContent = capitalize(faCategories[i])
+    faCategorySelector.appendChild(categoryOption)
   }
   document.getElementById('settings-button').addEventListener('click', function(e){
     mainView.classList.add('hidden')
@@ -524,28 +577,59 @@ function chnageSymbolType(targetId){
   }
   document.getElementById(targetId).classList.add('active')
   settingsData.symbolType = targetId
-  if(targetId == 'symbol-type-material' && installCheckMaterialFont == false){
-    mainView.classList.add('material-icons-hidden')
-    let detective = new Detector();
-    // check installing fonts: 'Material Icons'
-    if (detective.detect('Material Icons') == true) {
-      // console.log('installed!')
-      installCheckMaterialFont = true
-      mainView.classList.remove('material-icons-hidden')
+
+  document.getElementById('install-material-icons').classList.add('hidden')
+  document.getElementById('install-font-awesome').classList.add('hidden')
+
+  if(targetId == 'symbol-type-material'){
+    if(installCheckMaterialFont == false){
+      // console.log('font check')
+      mainView.classList.add('material-icons-hidden')
+      let detective = new Detector();
+      // check installing fonts: 'Material Icons'
+      if (detective.detect('Material Icons') == true) {
+        // console.log('installed!')
+        installCheckMaterialFont = true
+        mainView.classList.remove('material-icons-hidden')
+        document.getElementById('install-material-icons').classList.add('hidden')
+      } else {
+        // console.log('not install!')
+        document.getElementById('install-material-icons').classList.remove('hidden')
+      }
+    }else{
       document.getElementById('install-material-icons').classList.add('hidden')
-    } else {
-      // console.log('not install!')
-      document.getElementById('install-material-icons').classList.remove('hidden')
     }
-  }else{
-    document.getElementById('install-material-icons').classList.add('hidden')
+  }
+
+  if(targetId == 'symbol-type-fontawesome'){
+    if(installCheckFontAwesome == false){
+      // console.log('font check')
+      mainView.classList.add('font-awesome-hidden')
+      let detectiveFA = new Detector();
+      // check installing fonts: 'Font Awesome'
+      if (detectiveFA.detect('Font Awesome 5 Free') == true) {
+        // console.log('installed!')
+        installCheckFontAwesome = true
+        mainView.classList.remove('font-awesome-hidden')
+        document.getElementById('install-font-awesome').classList.add('hidden')
+      } else {
+        // console.log('not install!')
+        document.getElementById('install-font-awesome').classList.remove('hidden')
+      }
+    }else{
+      document.getElementById('install-font-awesome').classList.add('hidden')
+    }
+  }
+
+  for(let k = 0; k < categorySelectorItem.length; k++){
+    categorySelectorItem[k].classList.add('hidden')
   }
   if(targetId == 'symbol-type-sfsymbols'){
     sfCategorySelector.classList.remove('hidden')
-    miCategorySelector.classList.add('hidden')
-  }else{
-    sfCategorySelector.classList.add('hidden')
+  }else if(targetId == 'symbol-type-material'){
     miCategorySelector.classList.remove('hidden')
+  }else if(targetId == 'symbol-type-fontawesome'){
+    faCategorySelector.classList.remove('hidden')
   }
   symbolsTable.classList.add(targetId)
   toastMessage.classList.add(targetId)
@@ -625,12 +709,14 @@ function getSymbolTypeClassList(){
 function filterBySearchAndCategory(){
   let sfFilterCategory = sfCategorySelector.options[sfCategorySelector.selectedIndex].value
   let miFilterCategory = miCategorySelector.options[miCategorySelector.selectedIndex].value
-  if(searchKeyword == searchField.value && sfCurrentCategory == sfFilterCategory && miCurrentCategory == miFilterCategory){
+  let faFilterCategory = faCategorySelector.options[faCategorySelector.selectedIndex].value
+  if(searchKeyword == searchField.value && sfCurrentCategory == sfFilterCategory && miCurrentCategory == miFilterCategory && faCurrentCategory == faFilterCategory){
     return false
   }else{
     searchKeyword = searchField.value
     sfCurrentCategory = sfFilterCategory
     miCurrentCategory = miFilterCategory
+    faCurrentCategory = faFilterCategory
   }
   if(searchKeyword.length > 0){
     searchReset.classList.remove('hidden')
@@ -642,6 +728,7 @@ function filterBySearchAndCategory(){
   let filteredList = []
   let sfFilteredList = []
   let miFilteredList = []
+  let faFilteredList = []
   if(sfCurrentCategory){
     let regex = new RegExp(sfCurrentCategory)
     sfFilteredList = masterDataSF.filter(function(value){
@@ -659,7 +746,16 @@ function filterBySearchAndCategory(){
   }else{
     miFilteredList = masterDataMI
   }
-  filteredList = sfFilteredList.concat(miFilteredList)
+  if(faCurrentCategory){
+    let regex = new RegExp(faCurrentCategory)
+    faFilteredList = masterDataFA.filter(function(value){
+      return regex.test(value.category);
+    })
+    // console.log(faCurrentCategory)
+  }else{
+    faFilteredList = masterDataFA
+  }
+  filteredList = sfFilteredList.concat(miFilteredList).concat(faFilteredList)
 
   for(let i = 0; i < wordArray.length; i++){
     filteredList = filteringList(filteredList, wordArray[i])
@@ -676,7 +772,7 @@ function resetSearch(){
 
 // filter symbols list with search word
 function filteringList(list, filterWord){
-  let regex = new RegExp(filterWord)
+  let regex = new RegExp(filterWord, "i")
   let filteredList = list.filter(function(value){
     return regex.test(value.search_keyword);
   })
@@ -699,6 +795,7 @@ function filterByCategory(object){
 function clickGlyph(event){
   let glyph = event.target.getAttribute('data-glyph')
   let symbolType = event.target.getAttribute('data-symbol-type')
+  let symbolStyle = event.target.getAttribute('data-symbol-style')
   let textarea = document.getElementsByTagName("textarea")[0]
   let message = ''
   window.clearTimeout(toastID)
@@ -713,7 +810,7 @@ function clickGlyph(event){
   toastMessage.innerHTML = message+': <span>'+glyph+'</span>'
   toastMessage.classList.add('show')
   toastID = window.setTimeout(function(){toastMessage.classList.remove('show')}, 2000)
-  parent.postMessage({ pluginMessage: { copied: true, copiedGlyph: glyph, symbolType: symbolType } }, '*');
+  parent.postMessage({ pluginMessage: { copied: true, copiedGlyph: glyph, symbolType: symbolType, symbolStyle: symbolStyle } }, '*');
 }
 
 // create dom of glyph list
@@ -721,10 +818,14 @@ function createGlyphList(data){
   symbolsTable.innerHTML = ''
   data.forEach(val => {
     // console.log(val.character)
+    // console.log(val)
     let divWrapper = document.createElement('div')
     let divGlyph = document.createElement('div')
     let divName = document.createElement('div')
     divWrapper.classList.add('symbol-item', val.symbol_type)
+    if(val.style){
+      divWrapper.classList.add("symbol-style-"+val.style)
+    }
     divGlyph.classList.add('symbol-item-glyph')
     divName.classList.add('symbol-item-Name')
     divGlyph.textContent = val.character
@@ -733,16 +834,19 @@ function createGlyphList(data){
     divWrapper.appendChild(divName)
     divWrapper.setAttribute('data-glyph', val.character)
     divWrapper.setAttribute('data-symbol-type', val.symbol_type)
+    divWrapper.setAttribute('data-symbol-style', val.style)
     divWrapper.setAttribute('data-keyword', val.search_keyword)
     divWrapper.setAttribute('data-category', val.category)
     divWrapper.addEventListener('click', function(e){clickGlyph(e)}, false)
+    // console.log(val)
     symbolsTable.appendChild(divWrapper)
   })
 }
 
 // download csv file
 function getCSV(){
-  let promise_sf = new Promise((resolve, reject) => {
+  let promise_sf, promise_mi, promise_fa;
+  promise_sf = new Promise((resolve, reject) => {
     let reqSF = new XMLHttpRequest()
     reqSF.open("get", sfCsvFileName, true)
     reqSF.send(null)
@@ -754,7 +858,7 @@ function getCSV(){
   })
 
   promise_sf.then((response) => {
-      let promise_mi = new Promise((resolve, reject) => {
+    promise_mi = new Promise((resolve, reject) => {
       let reqMI = new XMLHttpRequest()
       reqMI.open("get", miCsvFileName, true)
       reqMI.send(null)
@@ -764,9 +868,20 @@ function getCSV(){
         resolve(true)
       }
     }).then((response) => {
-      masterData = masterDataSF.concat(masterDataMI)
-      symbolsTable.classList.remove('loading')
-      createGlyphList(masterData)
+      promise_fa = new Promise((resolve, reject) => {
+        let reqFA = new XMLHttpRequest()
+        reqFA.open("get", faCsvFileName, true)
+        reqFA.send(null)
+
+        reqFA.onload = function(){
+          masterDataFA = csv2json(reqFA.responseText, 'FA')
+          resolve(true)
+        }
+      }).then((response) => {
+        masterData = masterDataSF.concat(masterDataMI).concat(masterDataFA)
+        symbolsTable.classList.remove('loading')
+        createGlyphList(masterData)
+      })
     })
   })
 }
@@ -792,14 +907,32 @@ function csv2json(csv, type){
       master_line.symbol_type = "sf-symbols"
       master_line.character = a_line.character
       master_line.category = a_line.categories
-    }else{
+      jsonArray.push(master_line)
+    }else if(type == "MI"){
       master_line.short_name = a_line.short_name.replace(/[\.\_]/g, ' ')
       master_line.search_keyword = a_line.short_name
       master_line.symbol_type = "material-icons"
       master_line.character = a_line.character
       master_line.category = a_line.categories
+      jsonArray.push(master_line)
+    }else if(type == "FA"){
+      a_line.styles = a_line.styles.replace(/[\"]/g, '')
+      let stylesArray = a_line.styles.split(',')
+      for (var k = 0; k < stylesArray.length; k++){
+        let master_line_fa = new Object()
+        master_line_fa.short_name = a_line.short_name.replace(/[\.\_\-]/g, ' ')
+        if (stylesArray.length > 1){
+          master_line_fa.short_name += ' '+stylesArray[k]
+        }
+        master_line_fa.search_keyword = a_line.keyword+';'+a_line.short_name
+        master_line_fa.symbol_type = "font-awesome"
+        master_line_fa.character = a_line.character
+        master_line_fa.category = a_line.categories
+        master_line_fa.style = stylesArray[k]
+        jsonArray.push(master_line_fa)
+        // console.log(a_line.categories)
+      }
     }
-    jsonArray.push(master_line)
   }
   return jsonArray
 }
@@ -862,15 +995,18 @@ function capitalize(str){
         h.appendChild(s);
         defaultWidth[baseFonts[index]] = s.offsetWidth; //width for the default font
         defaultHeight[baseFonts[index]] = s.offsetHeight; //height for the defualt font
+        // console.log(baseFonts[index]+'    w:'+s.offsetWidth+' | h:'+s.offsetHeight)
         h.removeChild(s);
     }
 
     function detect(font) {
         var detected = false;
         for (var index in baseFonts) {
-            s.style.fontFamily = font + ',' + baseFonts[index]; // name of the font along with the base font for fallback.
+            s.style.fontFamily = '"'+font + '",' + baseFonts[index]; // name of the font along with the base font for fallback.
+            // console.log(s.style.fontFamily)
             h.appendChild(s);
             var matched = (s.offsetWidth != defaultWidth[baseFonts[index]] || s.offsetHeight != defaultHeight[baseFonts[index]]);
+            // console.log(font+'    w:'+s.offsetWidth+' | h:'+s.offsetHeight)
             h.removeChild(s);
             detected = detected || matched;
         }
