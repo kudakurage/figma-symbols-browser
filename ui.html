@@ -3,7 +3,7 @@
     font-family: 'SF Pro Display', 'SF Compact Display', sans-serif;
     background: #222;
     margin: 0;
-    padding: 50px 5px 20px;
+    padding: 50px 5px 0;
     font-size: 16px;
     color: #fff;
   }
@@ -27,6 +27,9 @@
       margin:0;
       padding:0;
       opacity:0;
+  }
+  #main-view {
+    overflow: auto;
   }
   #navbar,
   #settings-navbar {
@@ -151,6 +154,7 @@
     line-height: 60px;
     pointer-events: none;
     vertical-align: middle;
+    overflow: hidden;
   }
   .symbol-item-name {
     height: 30px;
@@ -188,7 +192,6 @@
     width: 60px;
     font-size: 24px;
     line-height: 50px;
-    overflow: hidden;
   }
   .display-type-symbols .symbol-item-name {
     display: none;
@@ -403,9 +406,9 @@
   </div>
   <div id="toast-message">Toast Message</div>
   <div id="symbols-category">
-    <select id="sf-category" class="category-select hidden" onchange="filterBySearchAndCategory()"><option value="">All</option></select>
-    <select id="mi-category" class="category-select hidden" onchange="filterBySearchAndCategory()"><option value="">All</option></select>
-    <select id="fa-category" class="category-select hidden" onchange="filterBySearchAndCategory()"><option value="">All</option></select>
+    <select id="sf-category" class="category-select hidden" onchange="filterBySearchAndCategory()"><option value="">All Categories</option></select>
+    <select id="mi-category" class="category-select hidden" onchange="filterBySearchAndCategory()"><option value="">All Categories</option></select>
+    <select id="fa-category" class="category-select hidden" onchange="filterBySearchAndCategory()"><option value="">All Categories</option></select>
   </div>
   <div id="symbols-table" class="clearfix loading"></div>
   <div id="install-font" class="install-font hidden">
@@ -672,6 +675,7 @@ function updateSettings(){
 
 // initialize settings
 function settingsInit(){
+  mainView.style.height = (settingsData.windowHeight - 55)+'px'
   chnageDisplayType(settingsData.displayType)
   chnageSymbolType(settingsData.symbolType)
   let settingClickAction = document.getElementById('settings-click-action')
@@ -921,6 +925,7 @@ function csv2json(csv, type){
       for (var k = 0; k < stylesArray.length; k++){
         let master_line_fa = new Object()
         master_line_fa.short_name = a_line.short_name.replace(/[\.\_\-]/g, ' ')
+        master_line_fa.short_name = master_line_fa.short_name.replace(/[\"]/g, '')
         if (stylesArray.length > 1){
           master_line_fa.short_name += ' '+stylesArray[k]
         }
